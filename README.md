@@ -15,7 +15,7 @@
 
 ```bibtex
 @inproceedings{acl2025sgg,
-     title={Taming LLMs by Scaling Learning Rates with Gradient Grouping},
+     title={Taming LLMs with Gradient Grouping},
      author={Li, Siyuan and Tian, Juanxi and Wang, Zedong and Jin, Xin and Liu, Zicheng and Zhang, Wentao and Xu, Dan},
      booktitle={Annual Meeting of the Association for Computational Linguistics},
      year={2025}
@@ -31,6 +31,10 @@
 
 ## Coming Soon
 
-<img src="SGG_1.png" width="900"/>
-<img src="SGG_2.png" width="900"/>
+<p align="center">
+  <img src="SGG_1.png" width="600"/>
+</p>
+<p align="center">
+  <img src="SGG_2.png" width="600"/>
+</p>
 
