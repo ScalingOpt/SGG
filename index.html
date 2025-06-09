@@ -1,1 +1,207 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>SGG: Taming LLMs with Gradient Grouping</title>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
 
+    body {
+      font-family: 'Inter', sans-serif;
+      background-color: #f9fafb; 
+      color: #111827;
+      line-height: 1.6;
+    }
+
+    header {
+      background: linear-gradient(135deg, #ffffff, #eaeef3);
+      padding: 4rem 2rem;
+      text-align: center;
+      box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+    }
+
+    header h1 {
+      font-size: 2.5rem;
+      font-weight: 700;
+      margin-bottom: 1rem;
+    }
+
+    header p {
+      font-size: 1.1rem;
+      max-width: 700px;
+      margin: 0 auto 2rem;
+      color: #4b5563;
+    }
+
+    .buttons {
+      display: flex;
+      justify-content: center;
+      gap: 1rem;
+      flex-wrap: wrap;
+    }
+
+    .buttons a {
+      display: inline-block;
+      padding: 0.75rem 1.5rem;
+      font-weight: 600;
+      border-radius: 9999px;
+      text-decoration: none;
+      transition: all 0.3s ease;
+    }
+
+    .btn-paper {
+      background-color: #000000;
+      color: white;
+    }
+
+    .btn-paper:hover {
+      background-color: #1a1a1a;
+    }
+
+    .btn-code {
+      background-color: #5d28a7;
+      color: white;
+    }
+
+    .btn-code:hover {
+      background-color: #4c208b;
+    }
+
+    section {
+      padding: 4rem 2rem;
+      max-width: 1000px;
+      margin: auto;
+    }
+
+    section h2 {
+      font-size: 2rem;
+      font-weight: 600;
+      margin-bottom: 1rem;
+      text-align: center;
+    }
+
+    section p {
+      font-size: 1.1rem;
+      color: #4b5563;
+      text-align: center;
+      max-width: 800px;
+      margin: 0 auto 2rem;
+    }
+
+    .features {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+      gap: 2rem;
+      margin-top: 3rem;
+    }
+
+    .feature {
+      background: white;
+      border-radius: 1rem;
+      padding: 2rem;
+      box-shadow: 0 4px 15px rgba(0, 0, 0, 0.05);
+      transition: transform 0.3s ease;
+    }
+
+    .feature:hover {
+      transform: translateY(-5px);
+    }
+
+    .feature h3 {
+      font-size: 1.25rem;
+      font-weight: 600;
+      margin-bottom: 1rem;
+    }
+
+    .feature p {
+      font-size: 0.95rem;
+      color: #6b7280;
+    }
+
+    footer {
+      text-align: center;
+      padding: 3rem 2rem;
+      background-color: #f3f4f6;
+      color: #6b7280;
+      font-size: 0.9rem;
+    }
+
+    .logo {
+      width: 120px;
+      margin-bottom: 1rem;
+    }
+
+    @media (max-width: 640px) {
+      header h1 {
+        font-size: 1.8rem;
+      }
+
+      .buttons {
+        flex-direction: column;
+        align-items: center;
+      }
+    }
+  </style>
+</head>
+<body>
+
+<header>
+  <img src="https://github.com/ScalingOpt/SGG/raw/main/logo.png"  alt="SGG Logo" class="logo"/>
+  <h1>Taming LLMs with Gradient Grouping</h1>
+  <p>We present SGG, an optimizer wrapper that scales adaptive learning rates with online grouping constraints rather than replace them in pre-defined groups, balancing parameter-wise dynamics and collective optimization behavior.</p>
+  <div class="buttons">
+    <a href="https://arxiv.org/pdf/2506.01049"  class="btn-paper" target="_blank">📄 Paper (arXiv)</a>
+    <a href="https://github.com/ScalingOpt/SGG"  class="btn-code" target="_blank">💻 Code (GitHub)</a>
+  </div>
+</header>
+
+<section>
+  <h2>Overview</h2>
+  <p>Training large language models (LLMs) poses challenges due to their massive scale and heterogeneous architectures. While adaptive optimizers like AdamW help address gradient variations, they still struggle with efficient and effective parameter-wise learning rate estimation, resulting in training instability, slow convergence, and poor compatibility with parameter-efficient fine-tuning techniques (PEFT).</p>
+  <p>This work introduces <strong>Scaling with Gradient Grouping (SGG)</strong>, an optimizer wrapper that improves adaptive learning rate estimation through dynamic clustering and group-specific scaling.</p>
+</section>
+
+<section>
+  <h2>Key Features</h2>
+  <div class="features">
+    <div class="feature">
+      <h3>Dynamic Clustering</h3>
+      <p>SGG dynamically clusters momentum vectors in each layer using Mini-Batch K-Means, enabling more precise per-parameter adaptation while maintaining collective constraints.</p>
+    </div>
+    <div class="feature">
+      <h3>Group-Specific Scaling</h3>
+      <p>Each cluster receives a specific learning rate scaling factor based on its deviation relative to global model statistics, promoting training homogeneity across layers.</p>
+    </div>
+    <div class="feature">
+      <h3>Plug-and-Play Integration</h3>
+      <p>SGG seamlessly integrates with existing optimizers such as Adam, Adafactor, and APOLLO, requiring no changes to the training pipeline or architecture.</p>
+    </div>
+    <div class="feature">
+      <h3>Robustness & Efficiency</h3>
+      <p>SGG is robust to varying batch sizes and learning rates, offering faster convergence and consistent performance gains across diverse LLM and MLLM benchmarks.</p>
+    </div>
+  </div>
+</section>
+
+<section>
+  <h2>Results</h2>
+  <p>Experiments show that SGG consistently delivers performance gains and faster convergence over baselines across different LLM and MLLM benchmarks, including pre-training on C4, supervised fine-tuning (SFT), PEFT on commonsense reasoning tasks, and Direct Preference Optimization (DPO). Notably:</p>
+  <ul style="list-style: disc; max-width: 800px; margin: 1rem auto; padding-left: 1.5rem;">
+    <li>Adam combined with SGG surpasses recent optimizers on C4 pre-training across diverse model sizes (from 60M to 1B).</li>
+    <li>SGG enables low-rank pre-training to match full-rank performance without modifying the training pipeline, yielding up to 30.4% lower validation perplexity over LoRA baselines.</li>
+    <li>SGG demonstrates exceptional robustness across varying batch sizes and learning rates.</li>
+  </ul>
+</section>
+
+<footer>
+  © 2025 <a href="https://github.com/ScalingOpt/SGG"  target="_blank">SGG Project</a>. Built by Siyuan Li, Juanxi Tian et al.
+</footer>
+
+</body>
+</html>
