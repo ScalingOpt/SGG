@@ -78,9 +78,12 @@
             margin-bottom: 20px;
         }
         .content img {
-            max-width: 100%;
+            max-width: 80%;
             height: auto;
             margin-bottom: 20px;
+            display: block;
+            margin-left: auto;
+            margin-right: auto;
         }
         .content table {
             width: 100%;
@@ -136,6 +139,7 @@
             <h2>Experiments</h2>
             <p>Experiments demonstrate that SGG consistently delivers performance gains and accelerates convergence across different LLM and MLLM benchmarks, such as pre-training on C4, supervised fine-tuning (SFT) on GLUE, PEFT on commonsense reasoning tasks, and Direct Preference Optimization (DPO). For instance, Adam combined with SGG could surpass recent optimizers on C4 pre-training across diverse model sizes (from 60M to 1B). More importantly, SGG enables low-rank pre-training to match full-rank performance without modifications to the training pipeline, yielding up to 30.4% lower validation perplexity over LoRA baselines.</p>
             <h3>Pre-training on C4</h3>
+            <p>We conducted extensive pre-training experiments on LLaMA-based large language models using the C4 dataset. The C4 dataset, a meticulously cleaned and processed version of Common Crawl’s web corpus, serves as a benchmark for pre-training language models and learning word representations.</p>
             <table>
                 <thead>
                     <tr>
@@ -177,7 +181,9 @@
                     </tr>
                 </tbody>
             </table>
+            <p><strong>Table 1:</strong> Validation Perplexity (PPL) on C4 pre-training with different optimizers and model sizes.</p>
             <h3>Supervised Fine-Tuning (SFT) on GLUE</h3>
+            <p>We fine-tuned the pre-trained RoBERTa-Base model on the GLUE benchmark using the Hugging Face implementation. The model was trained for 30 epochs with a batch size of 16 for all tasks except for CoLA, which utilized a batch size of 32.</p>
             <table>
                 <thead>
                     <tr>
@@ -229,7 +235,9 @@
                     </tr>
                 </tbody>
             </table>
+            <p><strong>Table 2:</strong> Top-1 accuracy on GLUE benchmark with RoBERTa-Base using different optimizers.</p>
             <h3>PEFT on Commonsense Reasoning</h3>
+            <p>We evaluated SGG’s compatibility and performance with PEFT methods on LLaMA architecture across 8 Commonsense Reasoning (CS) datasets.</p>
             <table>
                 <thead>
                     <tr>
@@ -271,7 +279,9 @@
                     </tr>
                 </tbody>
             </table>
+            <p><strong>Table 3:</strong> Top-1 accuracy on Commonsense Reasoning datasets with LLaMA-7B using different optimizers.</p>
             <h3>Direct Preference Optimization (DPO)</h3>
+            <p>We verified SGG’s effectiveness in aligning LLMs with human preferences using DPO.</p>
             <table>
                 <thead>
                     <tr>
@@ -293,6 +303,7 @@
                     </tr>
                 </tbody>
             </table>
+            <p><strong>Table 4:</strong> Top-1 accuracy on DPO with different optimizers.</p>
         </div>
     </div>
     <div class="footer">
