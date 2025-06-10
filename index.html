@@ -189,7 +189,7 @@
             <!-- Links -->
             <div class="column has-text-centered" style="margin-top:1.5em;">
               <span class="link-block">
-                <a href="http://arxiv.org/abs/2505.24863" class="external-link button is-normal is-rounded is-dark">
+                <a href="https://arxiv.org/abs/2506.01049" class="external-link button is-normal is-rounded is-dark">
                   <span class="icon">
                     <i class="ai ai-arxiv"></i>
                   </span>
@@ -197,7 +197,7 @@
                 </a>&nbsp;&nbsp;
               </span>
               <span class="link-block">
-                <a href="https://github.com/ASTRAL-Group/AlphaOne" class="external-link button is-normal is-rounded is-dark" role="button" target="_blank">
+                <a href="https://github.com/ScalingOpt/SGG" class="external-link button is-normal is-rounded is-dark" role="button" target="_blank">
                   <span class="icon">
                     <i class="fab fa-github"></i>
                   </span>
@@ -246,15 +246,14 @@
     <div class="container" style="max-width: 80%; margin: 0 auto;">
       <h1 class="title is-3" style="text-align:center; font-size: 2.3em; margin-bottom:1rem;">Overview</h1>
       <br>
+      <!-- 图片单独居中展示，并缩小 -->
+      <div style="text-align: center; margin: 2rem 0;">
+        <img src="website/img/SGG_2.png" alt="SGG Framework Overview" style="width: 50%; height: auto; display: inline-block;">
+      </div>
       <div class="content has-text-justified" style="max-width: 85%; font-size: 1.2em; margin: 0 auto; line-height: 1.55;">
         <p style="text-align:justify; color:rgb(31, 30, 30);">
           Training large language models (LLMs) poses challenges due to their massive scale and heterogeneous architectures. While adaptive optimizers like AdamW help address gradient variations, they still struggle with efficient and effective parameter-wise learning rate estimation, resulting in training instability, slow convergence, and poor compatibility with parameter-efficient fine-tuning (PEFT) techniques. This work introduces <span class="sgg">Scaling with Gradient Grouping</span> (SGG), an optimizer wrapper that improves adaptive learning rate estimation by dynamic grouping and group-specific scaling. SGG first groups gradient statistics in each layer into clusters and then applies cluster-specific scaling to calibrate learning rates for each parameter, thus imposing collective group-wise constraints while maintaining precise per-parameter adaptation.
         </p>
-  
-        <!-- 图片单独居中展示，并缩小 -->
-        <div style="text-align: center; margin: 2rem 0;">
-          <img src="website/img/SGG_2.png" alt="SGG Framework Overview" style="width: 70%; height: auto; display: inline-block;">
-        </div>
   
       </div>
     </div>
