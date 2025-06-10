@@ -1178,66 +1178,6 @@
                 </tr>
             </tbody>
         </table>
-        <h2 class="subtitle is-4" style="text-align:center; font-size: 1.1em;">Robustness to Learning Rate Scaling-up</h2>
-        <p>
-            Adam-like optimizers often struggle with the interplay between learning rate (LR) and batch size, leading to training instability. In contrast, SGG shows exceptional robustness in this regard. During SFT on Alpaca with Adam, SGG maintains stable validation loss across a wide spectrum of batch sizes (128 to 4096) and learning rates, even under extreme conditions like batch sizes of 4096 and LR of 0.1.
-        </p>
-        <figure class="image">
-            <img src="https://via.placeholder.com/600x400" alt="Learning Rate and Batch Size Scaling-up with Qwen2.5-0.5B SFT on Alpaca">
-            <figcaption style="font-weight: bold; text-align: center;">Figure 5: Learning Rate and Batch Size Scaling-up with Qwen2.5-0.5B SFT on Alpaca. Validation loss↓ vs SFT Learning Rate for Adam and Adam+SGG across various batch sizes (128 to 4096). SGG offers consistent robustness over a wider range of hyper-parameters.</figcaption>
-        </figure>
-        <h2 class="subtitle is-4" style="text-align:center; font-size: 1.1em;">Ablation Studies</h2>
-        <p>
-            We analyze the three key hyper-parameters in SGG: cluster number, recluster interval, and scaling decay.
-        </p>
-        <h3 class="subtitle is-5" style="text-align:center; font-size: 1em;">Cluster Number</h3>
-        <table class="table is-fullwidth">
-            <caption style="caption-side: top; font-weight: bold; text-align: center;">Table 9: Ablation studies of the number of SGG clusters K (task-relevant) across different tasks and models. ERR denotes the mini-batch K-means running errors.</caption>
-            <thead>
-                <tr>
-                    <th>Task</th>
-                    <th>Model</th>
-                    <th>K=1 (Adam)</th>
-                    <th>K=2</th>
-                    <th>K=3</th>
-                    <th>K=4</th>
-                </tr>
-            </thead>
-            <tbody>
-                <tr>
-                    <td>C4</td>
-                    <td>LLaMA-60M</td>
-                    <td>34.1</td>
-                    <td>30.3</td>
-                    <td>30.8</td>
-                    <td>ERR</td>
-                </tr>
-                <tr>
-                    <td>C4</td>
-                    <td>LLaMA-130M</td>
-                    <td>25.1</td>
-                    <td>23.3</td>
-                    <td>23.5</td>
-                    <td>ERR</td>
-                </tr>
-                <tr>
-                    <td>GLUE (MNLI)</td>
-                    <td>RoBERT-Base</td>
-                    <td>87.2</td>
-                    <td>88.3</td>
-                    <td>87.9</td>
-                    <td>ERR</td>
-                </tr>
-                <tr>
-                    <td>MLLM</td>
-                    <td>LLaVA-1.5-7B</td>
-                    <td>63.6</td>
-                    <td>64.2</td>
-                    <td>64.5</td>
-                    <td>64.3</td>
-                </tr>
-            </tbody>
-</table>
 </div>
 </section>
   
