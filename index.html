@@ -226,6 +226,8 @@
           <div class="box p-4" style="width: 80%; height: 90%; margin: 0 auto; display: flex; align-items: center;">
             <div class="columns is-mobile is-vcentered" style="display: table-row; margin: 0 auto; width: 100%;">
               <div class="column is-half" style="display: table-cell; vertical-align: middle;">
+                <img src="website/img/SGG_1.png" alt="alphaone-teaser" 
+                       style="max-width: 90%; margin-right: -0.3rem;" />
                 <div style="text-align: right; padding-right: -1rem;">
                   <p style="font-size: 0.9rem; color: #555; margin-top: 0.5rem; text-align: center;">
                     Scaling with Gradient Grouping. Illustration of SGG with online grouping and group-specific learning rate (LR) scaling upon adaptive LR optimizers.
@@ -248,8 +250,6 @@
     <div class="container" style="max-width: 80%; margin: 0 auto;">
       <h1 class="title is-3" style="text-align:center; font-size: 2.3em; margin-bottom:1rem;">Abstract</h1>
       <br>
-       <img src="website/img/SGG_1.png" alt="alphaone-teaser" 
-                       style="max-width: 90%; margin-right: -0.3rem;" />
       <div class="content has-text-justified" style="max-width: 85%; font-size: 1.2em; margin: 0 auto; line-height: 1.55;">
         <p style="text-align:justify; color:rgb(31, 30, 30);">
           Training large language models (LLMs) poses challenges due to their massive scale and heterogeneous architectures. While adaptive optimizers like AdamW help address gradient variations, they still struggle with efficient and effective parameter-wise learning rate estimation, resulting in training instability, slow convergence, and poor compatibility with parameter-efficient fine-tuning (PEFT) techniques. This work introduces <span class="sgg">Scaling with Gradient Grouping</span> (SGG), an optimizer wrapper that improves adaptive learning rate estimation by dynamic grouping and group-specific scaling. SGG first groups gradient statistics in each layer into clusters and then applies cluster-specific scaling to calibrate learning rates for each parameter, thus imposing collective group-wise constraints while maintaining precise per-parameter adaptation.
