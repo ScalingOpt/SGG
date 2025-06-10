@@ -123,7 +123,7 @@
               <span class="alphaone" style="vertical-align: middle;">SGG</span>
 
               <!-- Right: 2025 Main * Label -->
-              <span style="font-size: 0.6em; color: #555; vertical-align: middle;">2025 Main *</span>
+              <span style="font-size: 0.6em; color: #555; vertical-align: middle;">2025 Main ⭐️</span>
             </h1>
 
             <!-- SUBTITLE -->
@@ -265,71 +265,219 @@
       </div>
     </div>
   </section>
+  
+  <!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Taming LLMs by Scaling Learning Rates with Gradient Grouping</title>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bulma@0.9.4/css/bulma.min.css">
+  <style>
+    .tabs {
+      margin-bottom: 1rem;
+    }
+    .tab-content {
+      display: none;
+    }
+    .tab-content.active {
+      display: block;
+    }
+  </style>
+</head>
+<body>
 
-  <section class="section" id="overview" style="padding-top:1.5rem;">
-    <div class="container" style="max-width: 80%; margin: 0 auto;">
-      <h1 class="title is-3" style="text-align:center; font-size: 2.3em; margin-bottom:1rem;">Key Takeaways</h1>
-      <br>
-      <div class="content has-text-justified" style="max-width: 85%; font-size: 1.2em; margin: 0 auto; line-height: 1.55;">
-        <p style="text-align:justify; color:rgb(31, 30, 30);">
-          We present some insightful findings from evaluating three different <img src="website/img/SGG_2.png" width="25" height="25" style="display: inline-block; vertical-align: -2px;"> LLMs, ranging from 60M to 1B across six reasoning benchmarks, including math, code generation, and scientific problem reasoning.
-        </p>
-        <p style="text-align:justify; color:rgb(31, 30, 30); margin-bottom: -0.1em;">
-          <span style="font-size:1.3em;">💡</span> <b>Gradient Grouping</b> improves optimization efficiency and convergence.
-        </p>
-        <p style="text-align:justify; color:rgb(31, 30, 30); margin-bottom: -0.1em;">
-          <span style="font-size:1.3em;">💡</span> <b>Cluster-specific Scaling</b> ensures stable and efficient training.
-        </p>
-        <p style="text-align:justify; color:rgb(31, 30, 30);">
-          <span style="font-size:1.3em;">💡</span> <b>Dynamic Clustering</b> adapts to different layers and parameters.
-        </p>
-      </div>
-      <div class="columns is-centered has-text-centered">
-        <div class="column is-eight-fifths">
-          <figure class="table-figure">
-            <img class="figure-image" src="website/img/framework.png" alt="Figure 1. Overview of SGG." style="max-width: 85%; text-align:center; margin-bottom:1rem; margin-top:1.5rem;"/>
-            <figcaption class="figure-caption" style="font-size: 1.1em;">
-              <b>Figure 1.</b> Overview of <img src="website/img/SGG_2.png" width="23" height="23" style="display: inline-block; vertical-align: -2px;">.
-            </figcaption>
-          </figure>
-        </div>
-      </div>
-  </section> 
+<section class="section" id="Method" style="padding-top:1.5rem;">
+  <div class="container is-max-desktop content" style="max-width: 80%; margin: 0 auto -0.1rem auto;">
+    <h1 class="title is-3" style="text-align:center; font-size: 2.3em;">Method</h1>
+    <p>
+      Training large language models (LLMs) poses challenges due to their massive scale and heterogeneous architectures. While adaptive optimizers like AdamW help address gradient variations, they still struggle with efficient and effective parameter-wise learning rate estimation, resulting in training instability, slow convergence, and poor compatibility with parameter-efficient fine-tuning (PEFT) techniques. This work introduces Scaling with Gradient Grouping (SGG), an optimizer wrapper that improves adaptive learning rate estimation by dynamic grouping and group-specific scaling. SGG first groups gradient statistics in each layer into clusters and then applies cluster-specific scaling to calibrate learning rates for each parameter, thus imposing collective group-wise constraints while maintaining precise per-parameter adaptation.
+    </p>
+    <p>
+      SGG begins with dynamic grouping as GradCluster(mt<sub>l</sub>, K) in Algorithm 1, which partitions momentum vectors mt<sub>l</sub> within each layer l ∈ L into K groups with related indices Ct<sub>l</sub> according to their similarity. To achieve this, online clustering stands out as a straightforward solution, and the choice of specific clustering algorithms is then crucial for both effectiveness and efficiency. As such, we evaluate several potential strategies, including K-means, mini-batch K-means, Gaussian Mixture Models (GMM), and DBSCAN. Ablation studies in Figure 3 (perplexity versus training time) and Table 9 (hyper-parameters) show that mini-batch K-means offer the most favorable trade-off between clustering quality and computational efficiency. Thus, we select this as the default clustering implementation of GradCluster(mt<sub>l</sub>, K) in SGG.
+    </p>
+    <p>
+      We introduce ScaleUpdate(Ct<sub>l</sub>, gt<sub>l</sub>, β3) to calculate the scaling factor St<sub>l</sub>[c] for each cluster c ∈ K after grouping, which modulates learning rate αt<sub>l</sub>. This involves two sub-tasks: (i) measuring the statistics for different levels of partitions (e.g., clusters, layers, and even the global one); (ii) updating cluster-specific scales St<sub>l</sub>[c] based on the above statistics. This contrasts with the previous Adam-mini (Zhang et al., 2024), which replaces per-parameter adaptive learning rates with their group-wise means directly.
+    </p>
+  </div>
+</section>
 
-
-  <!-- BibTeX Section -->
-  <section class="section" id="BibTeX" style="padding-top:1.5rem;">
-    <div class="container is-max-desktop content" style="max-width: 80%; margin: 0 auto -0.1rem auto;">
-      <h1 class="title is-3" style="text-align:center; font-size: 2.3em;">BibTeX</h1>
-      <pre style="font-size: 1.0em;">
-        @inproceedings{acl2025sgg,
-          title={Taming LLMs with Gradient Grouping},
-          author={Li, Siyuan and Tian, Juanxi and Wang, Zedong and Jin, Xin and Liu, Zicheng and Zhang, Wentao and Xu, Dan},
-          booktitle={Annual Meeting of the Association for Computational Linguistics},
-          year={2025}
-       }
-      </pre>
+<section class="section" id="Experiments" style="padding-top:1.5rem;">
+  <div class="container is-max-desktop content" style="max-width: 80%; margin: 0 auto -0.1rem auto;">
+    <h1 class="title is-3" style="text-align:center; font-size: 2.3em;">Experiments</h1>
+    <div class="tabs">
+      <ul>
+        <li class="is-active"><a href="#" onclick="switchTab('tab1')">LLM Pre-training on C4</a></li>
+        <li><a href="#" onclick="switchTab('tab2')">LLM SFT on GLUE</a></li>
+        <li><a href="#" onclick="switchTab('tab3')">LLM PEFT on Commonsense Reasoning</a></li>
+        <li><a href="#" onclick="switchTab('tab4')">LLM RLHF with DPO</a></li>
+        <li><a href="#" onclick="switchTab('tab5')">MLLM SFT with LLaVA Variants</a></li>
+      </ul>
     </div>
-  </section>
+    <div id="tab1" class="tab-content active">
+      <h2 class="subtitle is-5">LLM Pre-training on C4</h2>
+      <table class="table is-fullwidth">
+        <thead>
+          <tr>
+            <th>Method</th>
+            <th>60M</th>
+            <th>130M</th>
+            <th>350M</th>
+            <th>1B</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>Adam</td>
+            <td>34.06</td>
+            <td>25.08</td>
+            <td>18.80</td>
+            <td>15.56</td>
+          </tr>
+          <tr>
+            <td>Adam+SGG</td>
+            <td>30.31</td>
+            <td>22.18</td>
+            <td>17.28</td>
+            <td>14.30</td>
+          </tr>
+        </tbody>
+      </table>
+      <p>
+        <strong>Caption:</strong> Validation perplexity (PPL) on C4 pre-training with different model sizes. Lower is better. SGG consistently improves performance over Adam.
+      </p>
+    </div>
+    <div id="tab2" class="tab-content">
+      <h2 class="subtitle is-5">LLM SFT on GLUE</h2>
+      <table class="table is-fullwidth">
+        <thead>
+          <tr>
+            <th>Task</th>
+            <th>Adam</th>
+            <th>Adam+SGG</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>MNLI</td>
+            <td>87.18</td>
+            <td>88.32</td>
+          </tr>
+          <tr>
+            <td>MRPC</td>
+            <td>91.30</td>
+            <td>92.65</td>
+          </tr>
+        </tbody>
+      </table>
+      <p>
+        <strong>Caption:</strong> Top-1 accuracy on GLUE benchmark tasks. SGG consistently improves performance over Adam.
+      </p>
+    </div>
+    <div id="tab3" class="tab-content">
+      <h2 class="subtitle is-5">LLM PEFT on Commonsense Reasoning</h2>
+      <table class="table is-fullwidth">
+        <thead>
+          <tr>
+            <th>Task</th>
+            <th>LoRA</th>
+            <th>LoRA+SGG</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>BoolQ</td>
+            <td>68.9</td>
+            <td>70.3</td>
+          </tr>
+          <tr>
+            <td>OBQA</td>
+            <td>74.8</td>
+            <td>79.0</td>
+          </tr>
+        </tbody>
+      </table>
+      <p>
+        <strong>Caption:</strong> Top-1 accuracy on commonsense reasoning tasks. SGG consistently improves performance over LoRA.
+      </p>
+    </div>
+    <div id="tab5" class="tab-content">
+      <h2 class="subtitle is-5">MLLM SFT with LLaVA Variants</h2>
+      <table class="table is-fullwidth">
+        <thead>
+          <tr>
+            <th>Method</th>
+            <th>VQAv2</th>
+            <th>GQA</th>
+            <th>VizWiz</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>AdamW</td>
+            <td>62.0</td>
+            <td>50.0</td>
+            <td>66.8</td>
+          </tr>
+          <tr>
+            <td>AdamW+SGG</td>
+            <td>62.4</td>
+            <td>50.2</td>
+            <td>69.8</td>
+          </tr>
+        </tbody>
+      </table>
+      <p>
+        <strong>Caption:</strong> Top-1 accuracy on MLLM tasks with LLaVA variants. SGG consistently improves performance over AdamW.
+      </p>
+    </div>
+  </div>
+</section>
 
-  <footer class="footer">
-    <!-- <div class="content has-text-centered"> -->
-    <div class="columns is-centered">
-        <div class="column is-9">
-          <div class="content">
-          <p style="font-size: 1.15em;">
-            This website is adapted from 
-            <a href="https://nerfies.github.io/" style="text-decoration: none;">Nerfies</a>, licensed under a 
-            <a rel="license" href="http://creativecommons.org/licenses/by-sa/4.0/" style="text-decoration: none;">
-              Creative Commons Attribution-ShareAlike 4.0 International License
-            </a>.
-          </p>
-        </div>
+<section class="section" id="BibTeX" style="padding-top:1.5rem;">
+  <div class="container is-max-desktop content" style="max-width: 80%; margin: 0 auto -0.1rem auto;">
+    <h1 class="title is-3" style="text-align:center; font-size: 2.3em;">BibTeX</h1>
+    <pre style="font-size: 1.0em;">
+      @inproceedings{acl2025sgg,
+        title={Taming LLMs with Gradient Grouping},
+        author={Li, Siyuan and Tian, Juanxi and Wang, Zedong and Jin, Xin and Liu, Zicheng and Zhang, Wentao and Xu, Dan},
+        booktitle={Annual Meeting of the Association for Computational Linguistics},
+        year={2025}
+      }
+    </pre>
+  </div>
+</section>
+
+<footer class="footer">
+  <div class="columns is-centered">
+    <div class="column is-9">
+      <div class="content">
+        <p style="font-size: 1.15em;">
+          This website is adapted from 
+          <a href="https://nerfies.github.io/" style="text-decoration: none;">Nerfies</a>, licensed under a 
+          <a rel="license" href="http://creativecommons.org/licenses/by-sa/4.0/" style="text-decoration: none;">
+            Creative Commons Attribution-ShareAlike 4.0 International License
+          </a>.
+        </p>
       </div>
     </div>
-  <!-- </div> -->
+  </div>
 </footer>
 
+<script>
+  function switchTab(tabId) {
+    const tabs = document.querySelectorAll('.tab-content');
+    tabs.forEach(tab => {
+      tab.classList.remove('active');
+      if (tab.id === tabId) {
+        tab.classList.add('active');
+      }
+    });
+    const tabList = document.querySelector('.tabs ul');
+    tabList.querySelector('.is-active').classList.remove('is-active');
+    tabList.querySelector(`a[href="#${tabId}"]`).parentElement.classList.add('is-active');
+  }
+</script>
 
 </body>
 </html>
