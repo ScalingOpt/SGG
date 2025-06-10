@@ -288,7 +288,7 @@
         <p>
             To evaluate the effectiveness and versatility of SGG, we conducted extensive experiments on various benchmarks and tasks, covering large language models (LLMs) and multimodal large language models (MLLMs). The experimental results demonstrate that SGG consistently improves performance, accelerates convergence, and exhibits robustness across different scenarios.
         </p>
-        <h2 class="subtitle is-4" style="text-align:center; font-size: 1.1em;">3.2 Comparison Results with LLMs</h2>
+        <h2 class="subtitle is-4" style="text-align:center; font-size: 1.1em;">Comparison Results with LLMs</h2>
         <h3 class="subtitle is-5" style="text-align:center; font-size: 1em;">Pre-training on C4</h3>
         <table class="table is-fullwidth">
             <caption style="caption-side: top; font-weight: bold; text-align: center;">Table 4: C4 Pre-training with diverse LLaMA sizes (from 60M to 1B). Comparison of full-rank, memory-efficient, and low-rank optimizers. Validation Perplexity (PPL%↓: lower is better) is reported. Bold and green types denote the best results and gains↓ of SGG (blue background) over related baselines (gray background). Note that † denotes the results borrowed from GaLore, while the others were reimplemented in this work.</caption>
@@ -1178,7 +1178,7 @@
                 </tr>
             </tbody>
         </table>
-        <h2 class="subtitle is-4" style="text-align:center; font-size: 1.1em;">3.4 Robustness to Learning Rate Scaling-up</h2>
+        <h2 class="subtitle is-4" style="text-align:center; font-size: 1.1em;">Robustness to Learning Rate Scaling-up</h2>
         <p>
             Adam-like optimizers often struggle with the interplay between learning rate (LR) and batch size, leading to training instability. In contrast, SGG shows exceptional robustness in this regard. During SFT on Alpaca with Adam, SGG maintains stable validation loss across a wide spectrum of batch sizes (128 to 4096) and learning rates, even under extreme conditions like batch sizes of 4096 and LR of 0.1.
         </p>
@@ -1186,7 +1186,7 @@
             <img src="https://via.placeholder.com/600x400" alt="Learning Rate and Batch Size Scaling-up with Qwen2.5-0.5B SFT on Alpaca">
             <figcaption style="font-weight: bold; text-align: center;">Figure 5: Learning Rate and Batch Size Scaling-up with Qwen2.5-0.5B SFT on Alpaca. Validation loss↓ vs SFT Learning Rate for Adam and Adam+SGG across various batch sizes (128 to 4096). SGG offers consistent robustness over a wider range of hyper-parameters.</figcaption>
         </figure>
-        <h2 class="subtitle is-4" style="text-align:center; font-size: 1.1em;">3.5 Ablation Studies</h2>
+        <h2 class="subtitle is-4" style="text-align:center; font-size: 1.1em;">Ablation Studies</h2>
         <p>
             We analyze the three key hyper-parameters in SGG: cluster number, recluster interval, and scaling decay.
         </p>
