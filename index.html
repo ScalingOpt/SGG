@@ -1,185 +1,276 @@
 <!DOCTYPE html>
 <html>
-
 <head>
   <link rel="icon" type="image/png" href="website/img/page_logo.png">
-
   <title>SGG: Taming LLMs by Scaling Learning Rates with Gradient Grouping</title>
-
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-datalabels@2.0.0"></script>
-    <script
-        src="https://cdn.jsdelivr.net/npm/chartjs-plugin-annotation@3.0.1/dist/chartjs-plugin-annotation.min.js"></script>
-
-    <link href="https://fonts.googleapis.com/css?family=Google+Sans|Noto+Sans|Castoro" rel="stylesheet">
-    <link rel="stylesheet" href="website/css/bulma.min.css">
-    <link rel="stylesheet" href="website/css/bulma-carousel.min.css">
-    <link rel="stylesheet" href="website/css/bulma-slider.min.css">
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/jpswalsh/academicons@1/css/academicons.min.css">
-    <link rel="stylesheet" href="website/css/fontawesome.all.min.css">
-
-    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
-    <script src="website/javascript/bulma-carousel.min.js"></script>
-    <script src="website/javascript/bulma-slider.min.js"></script>
-    <script src="website/javascript/explorer-index.js"></script>
-
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet"
-        integrity="sha384-1BmE4kWBq78iYhFldvKuhfTAU6auU8tT94WrHftjDbrCEXSU1oBoqyl2QvZ6jIW3" crossorigin="anonymous">
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"
-        integrity="sha384-ka7Sk0Gln4gmtz2MlQnikT1wXgYsOg+OMhuP+IlRH9sENBO0LRn5q+8nbTov4+1p"
-        crossorigin="anonymous"></script>
-
-    <link href="https://unpkg.com/tabulator-tables@5.5.2/dist/css/tabulator_bootstrap4.min.css" rel="stylesheet">
-    <script type="text/javascript" src="https://unpkg.com/tabulator-tables@5.5.2/dist/js/tabulator.min.js"></script>
-    <script defer src="website/javascript/fontawesome.all.min.js"></script>
-    <!-- <script src="website/javascript/peity-vanilla.js"></script> -->
-
-
-    <!-- below we load some js scripts -->
-    <script src="website/javascript/benchmark_table.js" type="module"></script>
-    <script src="https://polyfill.io/v3/polyfill.min.js?features=es6"></script>
-    <script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
-
-    <link rel="stylesheet" href="website/css/index.css">
-
-    <!-- Google tag (gtag.js) -->
-    <script async src="https://www.googletagmanager.com/gtag/js?id=G-C7GJ4FYMY9"></script>
-    <script>
-        window.dataLayer = window.dataLayer || [];
-        function gtag() { dataLayer.push(arguments); }
-        gtag('js', new Date());
-
-        gtag('config', 'G-C7GJ4FYMY9');
-    </script>
-
-    <!-- MathJax script -->
-    <script type="text/javascript" async
-        src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.5/MathJax.js?config=TeX-MML-AM_CHTML">
-    </script>
-    <script type="text/javascript">
-        MathJax.Hub.Config({
-            tex2jax: {inlineMath: [['$','$'], ['\\(','\\)']]}
+  <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-datalabels@2.0.0"></script>
+  <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-annotation@3.0.1/dist/chartjs-plugin-annotation.min.js"></script>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-1BmE4kWBq78iYhFldvKuhfTAU6auU8tT94WrHftjDbrCEXSU1oBoqyl2QvZ6jIW3" crossorigin="anonymous">
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js" integrity="sha384-ka7Sk0Gln4gmtz2MlQnikT1wXgYsOg+OMhuP+IlRH9sENBO0LRn5q+8nbTov4+1p" crossorigin="anonymous"></script>
+  <link href="https://unpkg.com/tabulator-tables@5.5.2/dist/css/tabulator_bootstrap4.min.css" rel="stylesheet">
+  <script type="text/javascript" src="https://unpkg.com/tabulator-tables@5.5.2/dist/js/tabulator.min.js"></script>
+  <link rel="stylesheet" href="website/css/bulma.min.css">
+  <link rel="stylesheet" href="website/css/bulma-carousel.min.css">
+  <link rel="stylesheet" href="website/css/bulma-slider.min.css">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/jpswalsh/academicons@1/css/academicons.min.css">
+  <link rel="stylesheet" href="website/css/fontawesome.all.min.css">
+  <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+  <script src="website/javascript/bulma-carousel.min.js"></script>
+  <script src="website/javascript/bulma-slider.min.js"></script>
+  <script src="website/javascript/explorer-index.js"></script>
+  <script defer src="website/javascript/fontawesome.all.min.js"></script>
+  <script src="website/javascript/benchmark_table.js" type="module"></script>
+  <script src="https://polyfill.io/v3/polyfill.min.js?features=es6"></script>
+  <script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+  <script async src="https://www.googletagmanager.com/gtag/js?id=G-C7GJ4FYMY9"></script>
+  <script>
+    window.dataLayer = window.dataLayer || [];
+    function gtag() { dataLayer.push(arguments); }
+    gtag('js', new Date());
+    gtag('config', 'G-C7GJ4FYMY9');
+  </script>
+  <script type="text/javascript" async src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.5/MathJax.js?config=TeX-MML-AM_CHTML"></script>
+  <script type="text/javascript">
+    MathJax.Hub.Config({
+      tex2jax: { inlineMath: [['$','$'], ['\\(','\\)']] }
+    });
+  </script>
+  <script>
+    document.addEventListener('DOMContentLoaded', function () {
+      var toggles = document.querySelectorAll('.toggle-section');
+      toggles.forEach(function(toggle) {
+        toggle.addEventListener('click', function() {
+          var content = document.getElementById(toggle.getAttribute('aria-controls'));
+          var toggleIcon = toggle.children[1].children[0];
+          content.classList.toggle('is-active');
+          if (content.classList.contains('is-active')) {
+            toggleIcon.style.transition = 'transform 0.3s ease';
+            toggleIcon.style.transform = 'rotate(180deg)';
+          } else {
+            toggleIcon.style.transition = 'transform 0.3s ease';
+            toggleIcon.style.transform = 'rotate(0deg)';
+          }
         });
-    </script>
+      });
+    });
+  </script>
 
-    <noscript>
-        <p><img alt="Clicky" width="1" height="1" src="https://in.getclicky.com/101339888ns.gif" /></p>
-    </noscript>
+  <style>
+    /* Reset default fonts and apply Times New Roman globally */
+    * {
+      font-family: 'Times New Roman', Times, serif !important;
+      box-sizing: border-box;
+    }
 
-    <script>
-        document.addEventListener('DOMContentLoaded', function () {
-        var toggles = document.querySelectorAll('.toggle-section');
-        toggles.forEach(function(toggle) {
-            toggle.addEventListener('click', function() {
-            var content = document.getElementById(toggle.getAttribute('aria-controls'));
-            var toggleIcon = toggle.children[1].children[0];
-            content.classList.toggle('is-active');
-            if (content.classList.contains('is-active')) {
-                toggleIcon.style.transition = 'transform 0.3s ease';
-                toggleIcon.style.transform = 'rotate(180deg)';
-            } else {
-                toggleIcon.style.transition = 'transform 0.3s ease';
-                toggleIcon.style.transform = 'rotate(0deg)';
-            }
-            });
-        });
-        });
-      </script>
+    body {
+      margin: 0;
+      padding: 0;
+      line-height: 1.6;
+      color: #333;
+    }
 
-    <style>
-        .collapse-content {
-          display: none;
-          margin-top: 10px;
-        }
-        .collapse-content.is-active {
-          display: block;
-        }
-        /* .toggle-section .icon.is-small {
-          transition: transform 0.3s ease;
-        } */
-        /* .toggle-section .fa-angle-up {
-          transform: rotate(180deg);
-        } */
-      </style>
+    /* Hero Section */
+    .hero {
+      padding: 2rem 0;
+      background-color: #f9f9f9;
+    }
+
+    .hero-body {
+      padding: 2rem 1.5rem;
+    }
+
+    .publication-title {
+      font-weight: 700;
+      color: #222;
+      margin-bottom: 1.5rem;
+    }
+
+    .title.is-1 {
+      font-size: 2.5rem;
+      line-height: 1.2;
+    }
+
+    .publication-authors {
+      font-size: 1.1rem;
+      color: #555;
+      margin: 0.5rem 0;
+    }
+
+    .author-block a {
+      color: #2b5a9b;
+      text-decoration: none;
+    }
+
+    .author-block a:hover {
+      text-decoration: underline;
+    }
+
+    .link-block .button {
+      margin: 0.5rem;
+      font-size: 1rem;
+    }
+
+    /* Section Styling */
+    .section {
+      padding: 2rem 0;
+    }
+
+    .container.is-max-desktop {
+      max-width: 960px;
+    }
+
+    .content p {
+      font-size: 1.15rem;
+      margin-bottom: 1.2rem;
+    }
+
+    .title.is-3 {
+      font-size: 2rem;
+      font-weight: 600;
+      color: #222;
+      margin-bottom: 1.5rem;
+    }
+
+    /* Image and Caption */
+    img {
+      max-width: 100%;
+      height: auto;
+      display: block;
+      margin: 0 auto;
+    }
+
+    .box {
+      border-radius: 8px;
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+      padding: 1.5rem;
+    }
+
+    /* Abstract and Method Sections */
+    .content.has-text-justified {
+      text-align: justify;
+    }
+
+    /* BibTeX Section */
+    pre {
+      background-color: #f5f5f5;
+      padding: 1rem;
+      border-radius: 6px;
+      font-size: 1rem;
+      line-height: 1.4;
+    }
+
+    /* Responsive Design */
+    @media screen and (max-width: 768px) {
+      .title.is-1 {
+        font-size: 1.8rem;
+      }
+
+      .title.is-3 {
+        font-size: 1.5rem;
+      }
+
+      .content p {
+        font-size: 1rem;
+      }
+
+      .box {
+        padding: 1rem;
+      }
+
+      .container {
+        padding: 0 1rem;
+      }
+    }
+
+    /* Collapse Section */
+    .collapse-content {
+      display: none;
+      margin-top: 1rem;
+    }
+
+    .collapse-content.is-active {
+      display: block;
+    }
+
+    /* Custom Class for SGG */
+    .sgg {
+      font-weight: bold;
+      color: #2b5a9b;
+    }
+
+    .alphaone {
+      font-weight: bold;
+      font-size: 1.2em;
+    }
+  </style>
 </head>
 
 <body>
-
-  <!-- Single-line Title with Bulma's .title.is-1 is-bold (centered heading) -->
+  <!-- Hero Section -->
   <section class="hero">
     <div class="hero-body">
       <div class="container is-max-desktop">
         <div class="columns is-centered">
           <div class="column has-text-centered">
-
-            <!-- MAIN TITLE (logo + "AlphaOne:") -->
-            <!-- TITLE -->
             <h1 class="title is-1 publication-title is-bold" style="display: flex; align-items: center; justify-content: center; gap: 10px;">
-              <!-- Left: ACL Image -->
               <img src="website/img/acl.png" alt="ACL Logo" style="height: 1em; vertical-align: middle;" />
-
-              <!-- Center: SGG Text -->
               <span class="alphaone" style="vertical-align: middle;">SGG</span>
-
-              <!-- Right: 2025 Main * Label -->
               <span style="font-size: 0.6em; color: #555; vertical-align: middle;">2025 Main ⭐️</span>
             </h1>
-
-            <!-- SUBTITLE -->
-            <h2 class="title is-1 publication-title is-bold" style="margin-top: -0.5em; margin-right: 30px; margin-left: 30px; text-align: center;">
+            <h2 class="title is-1 publication-title is-bold" style="margin-top: -0.5em; text-align: center;">
               Taming LLMs by Scaling Learning Rates with Gradient Grouping
             </h2>
-            <!-- Author list -->
             <div class="is-size-5 publication-authors">
               <span class="author-block">
-                <a href="https://lupin1998.github.io"   target="_blank">Siyuan Li*</a>
+                <a href="https://lupin1998.github.io" target="_blank">Siyuan Li*</a>
                 <sup style="display: inline-flex; align-items: center; margin-left: -0.3em; gap: 0.05em;">
                   <img src="website/img/zhejiang.png" alt="zhejiang" style="height: 1.2em; vertical-align: baseline; margin: 0 0.1em;">
-                </sup>&nbsp;&nbsp;&nbsp;
+                </sup>
               </span>
               <span class="author-block">
-                <a href="https://github.com/tianshijing"   target="_blank">Juanxi Tian*</a>
+                <a href="https://github.com/tianshijing" target="_blank">Juanxi Tian*</a>
                 <sup style="display: inline-flex; align-items: center; margin-left: -0.3em; gap: 0.05em;">
                   <img src="website/img/pku.png" alt="pku" style="height: 1.2em; vertical-align: baseline; margin: 0 0.1em;">
-                </sup>&nbsp;&nbsp;&nbsp;
+                </sup>
               </span>
               <span class="author-block">
-                <a href="https://jacky1128.github.io"   target="_blank">Zedong Wang*</a>
+                <a href="https://jacky1128.github.io" target="_blank">Zedong Wang*</a>
                 <sup style="display: inline-flex; align-items: center; margin-left: -0.3em; gap: 0.05em;">
                   <img src="website/img/hkust.png" alt="hkust" style="height: 1.2em; vertical-align: baseline; margin: 0 0.1em;">
-                </sup>&nbsp;&nbsp;&nbsp;
+                </sup>
               </span>
               <span class="author-block">
-                <a href="https://jinxins.github.io"   target="_blank">Xin Jin</a>
+                <a href="https://jinxins.github.io" target="_blank">Xin Jin</a>
                 <sup style="display: inline-flex; align-items: center; margin-left: -0.3em; gap: 0.05em;">
                   <img src="website/img/westlake.png" alt="westlake" style="height: 1.2em; vertical-align: baseline; margin: 0 0.1em;">
-                </sup>&nbsp;&nbsp;&nbsp;
+                </sup>
               </span><br>
               <span class="author-block">
                 <a href="">Zicheng Liu</a>
                 <sup style="display: inline-flex; align-items: center; margin-left: -0.3em; gap: 0.05em;">
                   <img src="website/img/zhejiang.png" alt="zhejiang" style="height: 1.2em; vertical-align: baseline; margin: 0 0.1em;">
-                </sup>&nbsp;&nbsp;&nbsp;
+                </sup>
               </span>
               <span class="author-block">
                 <a href="https://zwt233.github.io">Wentao Zhang</a>
                 <sup style="display: inline-flex; align-items: center; margin-left: -0.3em; gap: 0.05em;">
                   <img src="website/img/pku.png" alt="pku" style="height: 1.2em; vertical-align: baseline; margin: 0 0.1em;">
-                </sup>&nbsp;&nbsp;&nbsp;                
+                </sup>
               </span>
               <span class="author-block">
                 <a href="https://www.danxurgb.net">Dan Xu</a>
                 <sup style="display: inline-flex; align-items: center; margin-left: -0.3em; gap: 0.05em;">
                   <img src="website/img/hkust.png" alt="hkust" style="height: 1.2em; vertical-align: baseline; margin: 0 0.1em;">
-                </sup>&nbsp;&nbsp;&nbsp;
+                </sup>
               </span>
             </div>
             <div class="is-size-5 publication-authors" style="margin-top:1em;">
               <span class="author-block">
                 <sup style="display: inline-flex; align-items: center; margin-left: -0.3em; gap: 0.05em;">
                   <img src="website/img/zhejiang.png" alt="zhejiang" style="height: 1.2em; vertical-align: baseline; margin: 0 0.1em;">
-                </sup>Zhejiang University</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+                </sup>Zhejiang University</span>
               <span class="author-block">
                 <sup style="display: inline-flex; align-items: center; margin-left: -0.3em; gap: 0.05em;">
                   <img src="website/img/westlake.png" alt="westlake" style="height: 1.2em; vertical-align: baseline; margin: 0 0.1em;">
@@ -193,7 +284,6 @@
                   <img src="website/img/pku.png" alt="pku" style="height: 1.2em; vertical-align: baseline; margin: 0 0.1em;">
                 </sup>Peking University</span>
             </div>
-            <!-- Links -->
             <div class="column has-text-centered" style="margin-top:1.5em;">
               <span class="link-block">
                 <a href="https://arxiv.org/abs/2506.01049" class="external-link button is-normal is-rounded is-dark">
@@ -201,7 +291,7 @@
                     <i class="ai ai-arxiv"></i>
                   </span>
                   <span>Paper</span>
-                </a>&nbsp;&nbsp;
+                </a>
               </span>
               <span class="link-block">
                 <a href="https://github.com/ScalingOpt/SGG" class="external-link button is-normal is-rounded is-dark" role="button" target="_blank">
@@ -209,33 +299,27 @@
                     <i class="fab fa-github"></i>
                   </span>
                   <span>Code (Coming soon)</span>
-                </a> &nbsp;&nbsp;
+                </a>
               </span>
             </div>
-
           </div>
         </div>
       </div>
     </div>
   </section>
 
+  <!-- Image Section -->
   <section class="section">
-    <div class="container" style="margin-top: -6rem; margin-bottom: -4rem; max-width: 80%;">
-      <div class="columns is-centered m-6">
+    <div class="container" style="max-width: 960px; margin: 0 auto;">
+      <div class="columns is-centered">
         <div class="column is-full">
-          <!-- 使用 flex 布局保持内容居中 -->
-          <div class="box p-4" style="width: 80%; height: 90%; margin: 0 auto; display: flex; align-items: center;">
-            <div class="columns is-mobile is-vcentered" style="display: table-row; margin: 0 auto; width: 100%;">
-              <!-- 图片列 -->
-              <div class="column is-half" style="display: table-cell; vertical-align: middle;">
-                <div style="text-align: right; padding-right: -1rem;">
-                  <img src="website/img/SGG_1.png" alt="alphaone-teaser" 
-                       style="max-width: 90%; margin-right: -0.3rem;" />
-                  <!-- 添加 caption -->
-                  <p style="font-size: 0.9rem; color: #555; margin-top: 0.5rem; text-align: center;">
-                    Scaling with Gradient Grouping. Illustration of SGG with online grouping and group-specific learning rate (LR) scaling upon adaptive LR optimizers.
-                  </p>
-                </div>
+          <div class="box" style="padding: 1.5rem;">
+            <div class="columns is-vcentered">
+              <div class="column is-half">
+                <img src="website/img/SGG_1.png" alt="SGG Illustration" />
+                <p style="font-size: 0.95rem; color: #555; margin-top: 0.75rem; text-align: center;">
+                  Scaling with Gradient Grouping. Illustration of SGG with online grouping and group-specific learning rate (LR) scaling upon adaptive LR optimizers.
+                </p>
               </div>
             </div>
           </div>
@@ -243,55 +327,48 @@
       </div>
     </div>
   </section>
-<!-- <p style="text-align: left; margin: 0; color:rgb(60, 56, 56);"> 
-                  <b>Figure 1.</b> <b>Conceptual illustration</b> of reasoning modulation strategies. 
-                  Our <span style="font-size: 0.9em;">\(\alpha\)1</span> employs a <i>slow-to-fast</i> reasoning schedule controlled by <span style="font-size: 0.9em;">\(\alpha\)</span>. 
-                  <span style="font-size: 0.9em;">\(\alpha\)1</span> scales more efficiently than <i>monotonously increasing</i> method s1 (<span style="color: #dbbf65; font-weight: bold; font-size: 1.0em;">yellow</span>) and generally outperforms <i>monotonously decreasing</i> (<span style="color: #a36ca0; font-weight: bold; font-size: 1.0em;">purple</span>) approaches.
-                </p> -->
+
   <!-- Overview Section -->
-  <section class="section" id="overview" style="padding-top:1.5rem;">
-    <div class="container" style="max-width: 80%; margin: 0 auto;">
-      <h1 class="title is-3" style="text-align:center; font-size: 2.3em; margin-bottom:1rem;">Abstract</h1>
-      <br>
-      <!-- 图片单独居中展示，并缩小 -->
+  <section class="section" id="overview">
+    <div class="container" style="max-width: 960px; margin: 0 auto;">
+      <h1 class="title is-3">Abstract</h1>
       <div style="text-align: center; margin: 2rem 0;">
-        <img src="website/img/SGG_2.png" alt="SGG Framework Overview" style="width: 50%; height: auto; display: inline-block;">
+        <img src="website/img/SGG_2.png" alt="SGG Framework Overview" style="width: 60%; height: auto;" />
       </div>
-      <div class="content has-text-justified" style="max-width: 85%; font-size: 1.2em; margin: 0 auto; line-height: 1.55;">
-        <p style="text-align:justify; color:rgb(31, 30, 30);">
+      <div class="content has-text-justified">
+        <p>
           Training large language models (LLMs) poses challenges due to their massive scale and heterogeneous architectures. While adaptive optimizers like AdamW help address gradient variations, they still struggle with efficient and effective parameter-wise learning rate estimation, resulting in training instability, slow convergence, and poor compatibility with parameter-efficient fine-tuning (PEFT) techniques. This work introduces <span class="sgg">Scaling with Gradient Grouping</span> (SGG), an optimizer wrapper that improves adaptive learning rate estimation by dynamic grouping and group-specific scaling. SGG first groups gradient statistics in each layer into clusters and then applies cluster-specific scaling to calibrate learning rates for each parameter, thus imposing collective group-wise constraints while maintaining precise per-parameter adaptation.
         </p>
-  
       </div>
     </div>
   </section>
 
-  <section class="section" id="Method" style="padding-top:1.5rem;">
-    <div class="container is-max-desktop content" style="max-width: 80%; margin: 0 auto -0.1rem auto;">
-        <h1 class="title is-3" style="text-align:center; font-size: 2.3em;">Method</h1>
-        <p>
-            The key steps of SGG are as follows:
-        </p>
-        <ol>
-            <li>Dynamic Gradient Grouping: SGG dynamically clusters gradient statistics (specifically momentum vectors) in each layer into K groups using online clustering algorithms such as mini-batch K-means.</li>
-            <li>Cluster-specific Learning Rate Scaling: After grouping, SGG calculates a scaling factor for each cluster based on the deviation of the cluster's statistics relative to the layer's and the entire model's global statistics. This scaling factor modulates the learning rate for each parameter in the cluster.</li>
-            <li>Parameter Update: The scaled learning rates are then used to update the model parameters, ensuring that each parameter adapts its learning rate based on its group's characteristics while maintaining individual parameter adaptation.</li>
-        </ol>
+  <!-- Method Section -->
+  <section class="section" id="Method">
+    <div class="container is-max-desktop content">
+      <h1 class="title is-3">Method</h1>
+      <p>The key steps of SGG are as follows:</p>
+      <ol>
+        <li>Dynamic Gradient Grouping: SGG dynamically clusters gradient statistics (specifically momentum vectors) in each layer into K groups using online clustering algorithms such as mini-batch K-means.</li>
+        <li>Cluster-specific Learning Rate Scaling: After grouping, SGG calculates a scaling factor for each cluster based on the deviation of the cluster's statistics relative to the layer's and the entire model's global statistics. This scaling factor modulates the learning rate for each parameter in the cluster.</li>
+        <li>Parameter Update: The scaled learning rates are then used to update the model parameters, ensuring that each parameter adapts its learning rate based on its group's characteristics while maintaining individual parameter adaptation.</li>
+      </ol>
     </div>
-</section>
-</section>
+  </section>
+
   <!-- BibTeX Section -->
-  <section class="section" id="BibTeX" style="padding-top:1.5rem;">
-    <div class="container is-max-desktop content" style="max-width: 80%; margin: 0 auto -0.1rem auto;">
-      <h1 class="title is-3" style="text-align:center; font-size: 2.3em;">BibTeX</h1>
-      <pre style="font-size: 1.0em;">
-        @inproceedings{acl2025sgg,
-          title={Taming LLMs with Gradient Grouping},
-          author={Li, Siyuan and Tian, Juanxi and Wang, Zedong and Jin, Xin and Liu, Zicheng and Zhang, Wentao and Xu, Dan},
-          booktitle={Annual Meeting of the Association for Computational Linguistics},
-          year={2025}
-       }
+  <section class="section" id="BibTeX">
+    <div class="container is-max-desktop content">
+      <h1 class="title is-3">BibTeX</h1>
+      <pre>
+@inproceedings{acl2025sgg,
+  title={Taming LLMs with Gradient Grouping},
+  author={Li, Siyuan and Tian, Juanxi and Wang, Zedong and Jin, Xin and Liu, Zicheng and Zhang, Wentao and Xu, Dan},
+  booktitle={Annual Meeting of the Association for Computational Linguistics},
+  year={2025}
+}
       </pre>
     </div>
   </section>
-
+</body>
+</html>
