@@ -126,19 +126,19 @@
             <!-- Author list -->
             <div class="is-size-5 publication-authors">
               <span class="author-block">
-                <a href="https://lupin1998.github.io" target="_blank">Siyuan Li</a>
+                <a href="https://lupin1998.github.io" target="_blank">Siyuan Li*</a>
                 <sup style="display: inline-flex; align-items: center; margin-left: -0.3em; gap: 0.05em;">
-                  <img src="website/img/zhejiang.png" alt="zhejiang" style="height: 0.85em; vertical-align: baseline; margin: 0 0.1em;">&#8224;
+                  <img src="website/img/zhejiang.png" alt="zhejiang" style="height: 0.85em; vertical-align: baseline; margin: 0 0.1em;">;
                 </sup>&nbsp;&nbsp;&nbsp;
               </span>
               <span class="author-block">
-                <a href="https://github.com/tianshijing" target="_blank">Juanxi Tian</a>
+                <a href="https://github.com/tianshijing" target="_blank">Juanxi Tian*</a>
                 <sup style="display: inline-flex; align-items: center; margin-left: -0.3em; gap: 0.05em;">
-                  <img src="website/img/pku.png" alt="pku" style="height: 0.85em; vertical-align: baseline; margin: 0 0.1em;">&#8224;
+                  <img src="website/img/pku.png" alt="pku" style="height: 0.85em; vertical-align: baseline; margin: 0 0.1em;">;
                 </sup>&nbsp;&nbsp;&nbsp;
               </span>
               <span class="author-block">
-                <a href="https://jacky1128.github.io" target="_blank">Zedong Wang</a>
+                <a href="https://jacky1128.github.io" target="_blank">Zedong Wang*</a>
                 <sup style="display: inline-flex; align-items: center; margin-left: -0.3em; gap: 0.05em;">
                   <img src="website/img/hkust.png" alt="hkust" style="height: 0.85em; vertical-align: baseline; margin: 0 0.1em;">
                 </sup>&nbsp;&nbsp;&nbsp;
@@ -244,7 +244,7 @@
       <br>
       <div class="content has-text-justified" style="max-width: 85%; font-size: 1.2em; margin: 0 auto; line-height: 1.55;">
         <p style="text-align:justify; color:rgb(31, 30, 30);">
-          Training large language models (LLMs) poses challenges due to their massive scale and heterogeneous architectures. While adaptive optimizers like AdamW help address gradient variations, they still struggle with efficient and effective parameter-wise learning rate estimation, resulting in training instability, slow convergence, and poor compatibility with parameter-efficient fine-tuning (PEFT) techniques. This work introduces <span class="sgg">Scaling with Gradient Grouping</span> (<img src="website/img/SGG_2.png" width="25" height="25" style="display: inline-block; vertical-align: -2px;">), an optimizer wrapper that improves adaptive learning rate estimation by dynamic grouping and group-specific scaling. <img src="website/img/SGG_2.png" width="25" height="25" style="display: inline-block; vertical-align: -2px;"> first groups gradient statistics in each layer into clusters and then applies cluster-specific scaling to calibrate learning rates for each parameter, thus imposing collective group-wise constraints while maintaining precise per-parameter adaptation.
+          Training large language models (LLMs) poses challenges due to their massive scale and heterogeneous architectures. While adaptive optimizers like AdamW help address gradient variations, they still struggle with efficient and effective parameter-wise learning rate estimation, resulting in training instability, slow convergence, and poor compatibility with parameter-efficient fine-tuning (PEFT) techniques. This work introduces <span class="sgg">Scaling with Gradient Grouping</span> (SGG), an optimizer wrapper that improves adaptive learning rate estimation by dynamic grouping and group-specific scaling. <img src="website/img/SGG_2.png" width="50" height="50"> first groups gradient statistics in each layer into clusters and then applies cluster-specific scaling to calibrate learning rates for each parameter, thus imposing collective group-wise constraints while maintaining precise per-parameter adaptation.
         </p>
       </div>
   </section>
