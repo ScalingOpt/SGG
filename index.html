@@ -282,314 +282,1016 @@
     </div>
 </section>
 
-<section class="section" id="Experiments" style="padding-top:1.5rem;">
-    <div class="container" style="max-width: 80%; margin: 0 auto;">
-        <h1 class="title is-3" style="text-align:center; font-size: 2.3em; margin-bottom:1rem;">Experiments</h1>
-        <br>
-        <div class="content has-text-justified" style="max-width: 85%; font-size: 1.2em; margin: 0 auto; line-height: 1.55;">
-            <p style="text-align:justify; color:rgb(31, 30, 30);">
-                To thoroughly evaluate the effectiveness of Scaling with Gradient Grouping (SGG), we conducted a comprehensive set of experiments across various benchmarks and tasks. The results demonstrate that SGG consistently improves performance and accelerates convergence when integrated with different optimizers and models.
-            </p>
-        </div>
-        <br>
-        <div class="content has-text-justified" style="max-width: 85%; font-size: 1.2em; margin: 0 auto; line-height: 1.55;">
-            <h2 style="text-align:left; font-size: 1.5em; margin-bottom:0.5rem;">3.2 Comparison Results with LLMs</h2>
-            <p style="text-align:justify; color:rgb(31, 30, 30);">
-                SGG was evaluated on various LLM benchmarks, including pre-training on C4, supervised fine-tuning (SFT) on GLUE, PEFT on commonsense reasoning tasks, and Direct Preference Optimization (DPO). The results show that SGG consistently delivers performance gains and faster convergence across different model sizes and settings.
-            </p>
-            <br>
-            <h3 style="text-align:left; font-size: 1.4em; margin-bottom:0.5rem;">Pre-training on C4</h3>
-            <p style="text-align:justify; color:rgb(31, 30, 30);">
-                Table 4 shows the validation perplexity (PPL) for different optimizers and model sizes during pre-training on the C4 dataset. SGG consistently reduces validation perplexity compared to baselines, with significant gains across various model sizes.
-            </p>
-            <table class="table is-bordered is-striped" style="width: 100%; margin-bottom: 1rem;">
-                <thead>
-                    <tr>
-                        <th>Method</th>
-                        <th>Venue</th>
-                        <th>60M</th>
-                        <th>130M</th>
-                        <th>350M</th>
-                        <th>1B</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    <tr>
-                        <td>Adam</td>
-                        <td>ICLR'15</td>
-                        <td>34.06</td>
-                        <td>25.08</td>
-                        <td>18.80</td>
-                        <td>15.56</td>
-                    </tr>
-                    <tr>
-                        <td>NAdam</td>
-                        <td>ICLR'18</td>
-                        <td>35.86</td>
-                        <td>28.88</td>
-                        <td>19.24</td>
-                        <td>15.78</td>
-                    </tr>
-                    <tr>
-                        <td>RAdam</td>
-                        <td>ICLR'20</td>
-                        <td>30.43</td>
-                        <td>25.17</td>
-                        <td>19.13</td>
-                        <td>15.65</td>
-                    </tr>
-                    <tr>
-                        <td>LAMB</td>
-                        <td>ICLR'20</td>
-                        <td>33.04</td>
-                        <td>24.37</td>
-                        <td>18.26</td>
-                        <td>15.84</td>
-                    </tr>
-                    <tr>
-                        <td>Adan</td>
-                        <td>TPAMI'23</td>
-                        <td>32.01</td>
-                        <td>23.14</td>
-                        <td>17.32</td>
-                        <td>14.70</td>
-                    </tr>
-                    <tr>
-                        <td>Adam+SGG</td>
-                        <td>Ours</td>
-                        <td><strong>30.31</strong> (-3.75)</td>
-                        <td><strong>22.18</strong> (-2.90)</td>
-                        <td><strong>17.28</strong> (-1.52)</td>
-                        <td><strong>14.30</strong> (-1.26)</td>
-                    </tr>
-                </tbody>
-            </table>
-            <p style="text-align:justify; color:rgb(31, 30, 30);">
-                <strong>Table 4:</strong> C4 Pre-training with diverse LLaMA sizes (from 60M to 1B). Comparison of full-rank, memory-efficient, and low-rank optimizers. Validation Perplexity (PPL%↓: lower is better) is reported. Bold and green types denote the best results and gains↓ of SGG (blue background) over related baselines (gray background).
-            </p>
-            <br>
-            <h3 style="text-align:left; font-size: 1.4em; margin-bottom:0.5rem;">SFT on GLUE</h3>
-            <p style="text-align:justify; color:rgb(31, 30, 30);">
-                Table 5 shows the results of fine-tuning RoBERTa-base models on the GLUE benchmark. SGG consistently improves performance across various tasks and settings, demonstrating its versatility and robustness.
-            </p>
-            <table class="table is-bordered is-striped" style="width: 100%; margin-bottom: 1rem;">
-                <thead>
-                    <tr>
-                        <th>Optimizer</th>
-                        <th>Rank</th>
-                        <th>CoLA</th>
-                        <th>STS-B</th>
-                        <th>MRPC</th>
-                        <th>RTE</th>
-                        <th>SST2</th>
-                        <th>MNLI</th>
-                        <th>QNLI</th>
-                        <th>QQP</th>
-                        <th>Average</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    <tr>
-                        <td>AdamW</td>
-                        <td>Full</td>
-                        <td>62.24</td>
-                        <td>90.92</td>
-                        <td>91.30</td>
-                        <td>79.42</td>
-                        <td>94.57</td>
-                        <td>87.18</td>
-                        <td>92.33</td>
-                        <td>92.28</td>
-                        <td>86.24</td>
-                    </tr>
-                    <tr>
-                        <td>AdamW+SGG</td>
-                        <td>Full</td>
-                        <td><strong>63.36</strong> (+1.12)</td>
-                        <td><strong>91.22</strong> (+0.30)</td>
-                        <td><strong>92.65</strong> (+1.35)</td>
-                        <td><strong>80.87</strong> (+1.45)</td>
-                        <td><strong>95.58</strong> (+1.01)</td>
-                        <td><strong>88.32</strong> (+1.14)</td>
-                        <td><strong>92.88</strong> (+0.55)</td>
-                        <td><strong>93.32</strong> (+1.04)</td>
-                        <td><strong>87.28</strong> (+1.00)</td>
-                    </tr>
-                </tbody>
-            </table>
-            <p style="text-align:justify; color:rgb(31, 30, 30);">
-                <strong>Table 5:</strong> GLUE Benchmark Results with RoBERTa-base. Top-1 accuracy (%↑: higher is better) is reported. Comparison across both full-rank and low-rank (LoRA r = 4, r = 8) settings. Bold and green types denote the best results and performance gains↑ of SGG (blue background) compared to related baselines (gray background).
-            </p>
-            <br>
-            <h3 style="text-align:left; font-size: 1.4em; margin-bottom:0.5rem;">PEFT on Commonsense Reasoning</h3>
-            <p style="text-align:justify; color:rgb(31, 30, 30);">
-                Table 6 shows the results of evaluating SGG on commonsense reasoning tasks using the LLaMA-7B model. SGG consistently improves performance across all tasks, achieving significant gains over baselines.
-            </p>
-            <table class="table is-bordered is-striped" style="width: 100%; margin-bottom: 1rem;">
-                <thead>
-                    <tr>
-                        <th>Method</th>
-                        <th>BoolQ</th>
-                        <th>PIQA</th>
-                        <th>SIQA</th>
-                        <th>WG</th>
-                        <th>Arc-E</th>
-                        <th>OBQA</th>
-                        <th>Average</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    <tr>
-                        <td>LoRA</td>
-                        <td>68.9</td>
-                        <td>80.7</td>
-                        <td>77.4</td>
-                        <td>78.8</td>
-                        <td>77.8</td>
-                        <td>74.8</td>
-                        <td>74.7</td>
-                    </tr>
-                    <tr>
-                        <td>LoRA+SGG</td>
-                        <td><strong>70.3</strong> (+1.4)</td>
-                        <td><strong>83.6</strong> (+2.9)</td>
-                        <td><strong>78.8</strong> (+1.4)</td>
-                        <td><strong>81.7</strong> (+2.9)</td>
-                        <td><strong>81.5</strong> (+3.7)</td>
-                        <td><strong>79.0</strong> (+4.2)</td>
-                        <td><strong>77.6</strong> (+2.9)</td>
-                    </tr>
-                </tbody>
-            </table>
-            <p style="text-align:justify; color:rgb(31, 30, 30);">
-                <strong>Table 6:</strong> LLaMA-7B PEFT Results on Commonsense Reasoning. Comparison of LoRA+SGG (blue background) against baselines. Top-1 accuracy (%↑: higher is better) of selected tasks and all tasks on average (Avg.) are reported. Bold and green types denote the best results and gains↑ compared to LoRA (gray background).
-            </p>
-            <br>
-            <h3 style="text-align:left; font-size: 1.4em; margin-bottom:0.5rem;">DPO</h3>
-            <p style="text-align:justify; color:rgb(31, 30, 30);">
-                Table 7 shows the results of Direct Preference Optimization (DPO) using the Qwen2.5-0.5B model. SGG consistently improves performance across different optimizers and settings.
-            </p>
-            <table class="table is-bordered is-striped" style="width: 100%; margin-bottom: 1rem;">
-                <thead>
-                    <tr>
-                        <th>Optimizer</th>
-                        <th>Full-Rank</th>
-                        <th>LoRA</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    <tr>
-                        <td>SGD</td>
-                        <td>70.10</td>
-                        <td>69.73</td>
-                    </tr>
-                    <tr>
-                        <td>AdamW</td>
-                        <td>71.39</td>
-                        <td>70.22</td>
-                    </tr>
-                    <tr>
-                        <td>LAMB</td>
-                        <td>70.82</td>
-                        <td>70.39</td>
-                    </tr>
-                    <tr>
-                        <td>SGD+SGG</td>
-                        <td><strong>70.82</strong> (+0.72)</td>
-                        <td><strong>70.76</strong> (+1.03)</td>
-                    </tr>
-                    <tr>
-                        <td>AdamW+SGG</td>
-                        <td><strong>71.85</strong> (+0.47)</td>
-                        <td><strong>72.02</strong> (+1.80)</td>
-                    </tr>
-                    <tr>
-                        <td>LAMB+SGG</td>
-                        <td><strong>71.32</strong> (+0.50)</td>
-                        <td><strong>71.28</strong> (+0.89)</td>
-                    </tr>
-                </tbody>
-            </table>
-            <p style="text-align:justify; color:rgb(31, 30, 30);">
-                <strong>Table 7:</strong> Qwen2.5-0.5B DPO Results with full-rank and LoRA setups. Top-1 accuracy(%)↑ is reported. Bold and green types denote best results and relative gains.
-            </p>
-            <br>
-            <h2 style="text-align:left; font-size: 1.5em; margin-bottom:0.5rem;">3.3 Comparison Results with MLLMs</h2>
-            <p style="text-align:justify; color:rgb(31, 30, 30);">
-                SGG was also evaluated on various multimodal LLM benchmarks, including VQA and MLLM evaluation benchmarks. The results demonstrate that SGG consistently improves performance across different tasks and settings.
-            </p>
-            <br>
-            <h3 style="text-align:left; font-size: 1.4em; margin-bottom:0.5rem;">Full-Rank SFT</h3>
-            <p style="text-align:justify; color:rgb(31, 30, 30);">
-                Table 8 shows the results of supervised fine-tuning (SFT) on various MLLM benchmarks using full-rank optimizers. SGG consistently improves performance across different tasks and optimizers.
-            </p>
-            <table class="table is-bordered is-striped" style="width: 100%; margin-bottom: 1rem;">
-                <thead>
-                    <tr>
-                        <th>Method</th>
-                        <th>Image Question Answering Benchmarks</th>
-                        <th>Avg.</th>
-                        <th>GQA</th>
-                        <th>VizWiz</th>
-                        <th>SciVQAI</th>
-                        <th>VQAT</th>
-                        <th>MMB</th>
-                        <th>MMBCN</th>
-                        <th>POPE</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    <tr>
-                        <td>LLaVA-v1.5 AdamW</td>
-                        <td>62.0</td>
-                        <td>50.0</td>
-                        <td>66.8</td>
-                        <td>58.2</td>
-                        <td>64.3</td>
-                        <td>58.3</td>
-                        <td>85.9</td>
-                        <td>63.6</td>
-                    </tr>
-                    <tr>
-                        <td>LLaVA-v1.5 Adafactor</td>
-                        <td>62.7</td>
-                        <td>48.2</td>
-                        <td>70.7</td>
-                        <td>57.1</td>
-                        <td>66.1</td>
-                        <td>60.4</td>
-                        <td>86.0</td>
-                        <td>64.5</td>
-                    </tr>
-                    <tr>
-                        <td>LLaVA-v1.5 LAMB</td>
-                        <td>43.8</td>
-                        <td>53.3</td>
-                        <td>61.5</td>
-                        <td>43.4</td>
-                        <td>43.2</td>
-                        <td>41.8</td>
-                        <td>81.2</td>
-                        <td>52.6</td>
-                    </tr>
-                    <tr>
-                        <td>LLaVA-v1.5 AdamW+SGG</td>
-                        <td><strong>62.4</strong> (+0.4)</td>
-                        <td><strong>50.2</strong> (+0.2)</td>
-                        <td><strong>69.8</strong> (+3.0)</td>
-                        <td><strong>57.4</strong> (-0.8)</td>
-                        <td><strong>65.9</strong> (+1.6)</td>
-                        <td><strong>60.1</strong> (+1.8)</td>
-                        <td><strong>86.3</strong> (+0.4)</td>
-                        <td><strong>64.6</strong> (+1.0)</td>
-                    </tr>
-                </tbody>
-            </table>
-            <p style="text-align:justify; color:rgb(31, 30, 30);">
-                <strong>Table 8:</strong> MLLM performance comparison on diverse benchmarks with LLaVA variants and different optimizers. Top-1 accuracy (%)↑ for selected tasks and all-task averaged (Avg.) results are reported. MMB and MMBCN denote MMbench and MMbench (Chinese). Bold and green types denote the best results and gains↓ of SGG (blue background) over related baselines (gray background). Please view Table A6 for the full results.
-            </p>
-        </div>
-    </div>
+<section class="section" id="Experiment" style="padding-top:1.5rem;">
+    <div class="container is-max-desktop content" style="max-width: 85%; margin: 0 auto;">
+        <h1 class="title is-3" style="text-align:center; font-size: 1.2em;">Experiment</h1>
+        <p>
+            To evaluate the effectiveness and versatility of SGG, we conducted extensive experiments on various benchmarks and tasks, covering large language models (LLMs) and multimodal large language models (MLLMs). The experimental results demonstrate that SGG consistently improves performance, accelerates convergence, and exhibits robustness across different scenarios.
+        </p>
+        <h2 class="subtitle is-4" style="text-align:center; font-size: 1.1em;">3.2 Comparison Results with LLMs</h2>
+        <h3 class="subtitle is-5" style="text-align:center; font-size: 1em;">Pre-training on C4</h3>
+        <table class="table is-fullwidth">
+            <caption style="caption-side: top; font-weight: bold; text-align: center;">Table 4: C4 Pre-training with diverse LLaMA sizes (from 60M to 1B). Comparison of full-rank, memory-efficient, and low-rank optimizers. Validation Perplexity (PPL%↓: lower is better) is reported. Bold and green types denote the best results and gains↓ of SGG (blue background) over related baselines (gray background). Note that † denotes the results borrowed from GaLore, while the others were reimplemented in this work.</caption>
+            <thead>
+                <tr>
+                    <th>Method</th>
+                    <th>Venue</th>
+                    <th>60M</th>
+                    <th>130M</th>
+                    <th>350M</th>
+                    <th>1B</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td>Adam†</td>
+                    <td>ICLR’15</td>
+                    <td>34.06</td>
+                    <td>25.08</td>
+                    <td>18.80</td>
+                    <td>15.56</td>
+                </tr>
+                <tr>
+                    <td>NAdam</td>
+                    <td>ICLR’18</td>
+                    <td>35.86</td>
+                    <td>28.88</td>
+                    <td>19.24</td>
+                    <td>15.78</td>
+                </tr>
+                <tr>
+                    <td>RAdam</td>
+                    <td>ICLR’20</td>
+                    <td>30.43</td>
+                    <td>25.17</td>
+                    <td>19.13</td>
+                    <td>15.65</td>
+                </tr>
+                <tr>
+                    <td>LAMB</td>
+                    <td>ICLR’20</td>
+                    <td>33.04</td>
+                    <td>24.37</td>
+                    <td>18.26</td>
+                    <td>15.84</td>
+                </tr>
+                <tr>
+                    <td>Adan</td>
+                    <td>TPAMI’23</td>
+                    <td>32.01</td>
+                    <td>23.14</td>
+                    <td>17.32</td>
+                    <td>14.70</td>
+                </tr>
+                <tr>
+                    <td>Adam+SGG</td>
+                    <td>Ours</td>
+                    <td><span style="background-color: #E6F7FF; color: #007BFF;">30.31</span></td>
+                    <td><span style="background-color: #E6F7FF; color: #007BFF;">22.18</span></td>
+                    <td><span style="background-color: #E6F7FF; color: #007BFF;">17.28</span></td>
+                    <td><span style="background-color: #E6F7FF; color: #007BFF;">14.30</span></td>
+                </tr>
+                <tr>
+                    <td>∆ Gains</td>
+                    <td></td>
+                    <td>-3.75</td>
+                    <td>-2.90</td>
+                    <td>-1.52</td>
+                    <td>-1.26</td>
+                </tr>
+                <tr>
+                    <td>Adam-mini†</td>
+                    <td>ICLR’25</td>
+                    <td>34.10</td>
+                    <td>24.85</td>
+                    <td>19.05</td>
+                    <td>16.07</td>
+                </tr>
+                <tr>
+                    <td>Adafactor†</td>
+                    <td>ICML’18</td>
+                    <td>32.57</td>
+                    <td>23.98</td>
+                    <td>17.74</td>
+                    <td>15.19</td>
+                </tr>
+                <tr>
+                    <td>Low-Rank†</td>
+                    <td>arXiv’22</td>
+                    <td>78.18</td>
+                    <td>45.51</td>
+                    <td>37.41</td>
+                    <td>34.53</td>
+                </tr>
+                <tr>
+                    <td>CAME</td>
+                    <td>ACL’23</td>
+                    <td>31.37</td>
+                    <td>23.38</td>
+                    <td>17.45</td>
+                    <td>14.68</td>
+                </tr>
+                <tr>
+                    <td>CAME+SGG</td>
+                    <td>Ours</td>
+                    <td><span style="background-color: #E6F7FF; color: #007BFF;">30.15</span></td>
+                    <td><span style="background-color: #E6F7FF; color: #007BFF;">22.91</span></td>
+                    <td><span style="background-color: #E6F7FF; color: #007BFF;">17.09</span></td>
+                    <td><span style="background-color: #E6F7FF; color: #007BFF;">14.35</span></td>
+                </tr>
+                <tr>
+                    <td>∆ Gains</td>
+                    <td></td>
+                    <td>-1.22</td>
+                    <td>-0.46</td>
+                    <td>-0.36</td>
+                    <td>-0.33</td>
+                </tr>
+                <tr>
+                    <td>APOLLO†</td>
+                    <td>MLSys’25</td>
+                    <td>31.55</td>
+                    <td>22.94</td>
+                    <td>16.85</td>
+                    <td>14.20</td>
+                </tr>
+                <tr>
+                    <td>APOLLO+SGG</td>
+                    <td>Ours</td>
+                    <td><span style="background-color: #E6F7FF; color: #007BFF;">30.18</span></td>
+                    <td><span style="background-color: #E6F7FF; color: #007BFF;">22.52</span></td>
+                    <td><span style="background-color: #E6F7FF; color: #007BFF;">16.54</span></td>
+                    <td><span style="background-color: #E6F7FF; color: #007BFF;">13.95</span></td>
+                </tr>
+                <tr>
+                    <td>∆ Gains</td>
+                    <td></td>
+                    <td>-1.37</td>
+                    <td>-0.42</td>
+                    <td>-0.31</td>
+                    <td>-0.25</td>
+                </tr>
+                <tr>
+                    <td>LoRA†</td>
+                    <td>ICLR’22</td>
+                    <td>34.99</td>
+                    <td>33.92</td>
+                    <td>25.58</td>
+                    <td>19.21</td>
+                </tr>
+                <tr>
+                    <td>ReLoRA†</td>
+                    <td>ICLR’23</td>
+                    <td>37.04</td>
+                    <td>29.37</td>
+                    <td>29.08</td>
+                    <td>18.33</td>
+                </tr>
+                <tr>
+                    <td>GaLore†</td>
+                    <td>ICML’24</td>
+                    <td>34.88</td>
+                    <td>25.36</td>
+                    <td>18.95</td>
+                    <td>15.64</td>
+                </tr>
+                <tr>
+                    <td>LoRA+SGG</td>
+                    <td>Ours</td>
+                    <td><span style="background-color: #E6F7FF; color: #007BFF;">30.62</span></td>
+                    <td><span style="background-color: #E6F7FF; color: #007BFF;">23.62</span></td>
+                    <td><span style="background-color: #E6F7FF; color: #007BFF;">17.86</span></td>
+                    <td><span style="background-color: #E6F7FF; color: #007BFF;">14.73</span></td>
+                </tr>
+                <tr>
+                    <td>∆ Gains</td>
+                    <td></td>
+                    <td>-4.37</td>
+                    <td>-10.30</td>
+                    <td>-7.72</td>
+                    <td>-4.48</td>
+                </tr>
+            </tbody>
+        </table>
+        <h3 class="subtitle is-5" style="text-align:center; font-size: 1em;">SFT on GLUE</h3>
+        <table class="table is-fullwidth">
+            <caption style="caption-side: top; font-weight: bold; text-align: center;">Table 5: GLUE Benchmark Results with RoBERTa-base. Top-1 accuracy (%↑: higher is better) is reported. Comparison across both full-rank and low-rank (LoRA r = 4, r = 8) settings. Bold and green types denote the best results and performance gains↑ of SGG (blue background) compared to related baselines (gray background).</caption>
+            <thead>
+                <tr>
+                    <th>Optimizer</th>
+                    <th>Rank</th>
+                    <th>CoLA</th>
+                    <th>STS-B</th>
+                    <th>MRPC</th>
+                    <th>RTE</th>
+                    <th>SST2</th>
+                    <th>MNLI</th>
+                    <th>QNLI</th>
+                    <th>QQP</th>
+                    <th>Average</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td>SGD</td>
+                    <td>Full</td>
+                    <td>62.12</td>
+                    <td>90.73</td>
+                    <td>87.74</td>
+                    <td>79.06</td>
+                    <td>94.26</td>
+                    <td>87.53</td>
+                    <td>92.29</td>
+                    <td>92.22</td>
+                    <td>85.74</td>
+                </tr>
+                <tr>
+                    <td>AdamW</td>
+                    <td>Full</td>
+                    <td>62.24</td>
+                    <td>90.92</td>
+                    <td>91.30</td>
+                    <td>79.42</td>
+                    <td>94.57</td>
+                    <td>87.18</td>
+                    <td>92.33</td>
+                    <td>92.28</td>
+                    <td>86.24</td>
+                </tr>
+                <tr>
+                    <td>LAMB</td>
+                    <td>Full</td>
+                    <td>62.09</td>
+                    <td>90.59</td>
+                    <td>88.72</td>
+                    <td>75.45</td>
+                    <td>94.72</td>
+                    <td>87.71</td>
+                    <td>92.42</td>
+                    <td>91.46</td>
+                    <td>85.40</td>
+                </tr>
+                <tr>
+                    <td>CAME</td>
+                    <td>Full</td>
+                    <td>62.16</td>
+                    <td>90.43</td>
+                    <td>89.02</td>
+                    <td>75.94</td>
+                    <td>94.61</td>
+                    <td>87.13</td>
+                    <td>92.31</td>
+                    <td>91.54</td>
+                    <td>85.39</td>
+                </tr>
+                <tr>
+                    <td>APOLLO</td>
+                    <td>Full</td>
+                    <td>62.45</td>
+                    <td>90.70</td>
+                    <td>90.36</td>
+                    <td>77.53</td>
+                    <td>94.58</td>
+                    <td>87.57</td>
+                    <td>92.40</td>
+                    <td>92.12</td>
+                    <td>85.96</td>
+                </tr>
+                <tr>
+                    <td>AdamW+SGG</td>
+                    <td>Full</td>
+                    <td><span style="background-color: #E6F7FF; color: #007BFF;">63.36</span></td>
+                    <td><span style="background-color: #E6F7FF; color: #007BFF;">91.22</span></td>
+                    <td><span style="background-color: #E6F7FF; color: #007BFF;">92.65</span></td>
+                    <td><span style="background-color: #E6F7FF; color: #007BFF;">80.87</span></td>
+                    <td><span style="background-color: #E6F7FF; color: #007BFF;">95.58</span></td>
+                    <td><span style="background-color: #E6F7FF; color: #007BFF;">88.32</span></td>
+                    <td><span style="background-color: #E6F7FF; color: #007BFF;">92.88</span></td>
+                    <td><span style="background-color: #E6F7FF; color: #007BFF;">93.32</span></td>
+                    <td><span style="background-color: #E6F7FF; color: #007BFF;">87.28</span></td>
+                </tr>
+                <tr>
+                    <td>LAMB+SGG</td>
+                    <td>Full</td>
+                    <td><span style="background-color: #E6F7FF; color: #007BFF;">62.47</span></td>
+                    <td><span style="background-color: #E6F7FF; color: #007BFF;">90.90</span></td>
+                    <td><span style="background-color: #E6F7FF; color: #007BFF;">89.46</span></td>
+                    <td><span style="background-color: #E6F7FF; color: #007BFF;">76.53</span></td>
+                    <td><span style="background-color: #E6F7FF; color: #007BFF;">94.95</span></td>
+                    <td><span style="background-color: #E6F7FF; color: #007BFF;">87.81</span></td>
+                    <td><span style="background-color: #E6F7FF; color: #007BFF;">92.89</span></td>
+                    <td><span style="background-color: #E6F7FF; color: #007BFF;">91.78</span></td>
+                    <td><span style="background-color: #E6F7FF; color: #007BFF;">85.85</span></td>
+                </tr>
+                <tr>
+                    <td>SGD (LoRA)</td>
+                    <td>4</td>
+                    <td>60.32</td>
+                    <td>90.31</td>
+                    <td>87.75</td>
+                    <td>79.06</td>
+                    <td>94.27</td>
+                    <td>87.39</td>
+                    <td>92.16</td>
+                    <td>91.89</td>
+                    <td>85.39</td>
+                </tr>
+                <tr>
+                    <td>AdamW (LoRA)</td>
+                    <td>4</td>
+                    <td>61.38</td>
+                    <td>90.57</td>
+                    <td>91.07</td>
+                    <td>78.70</td>
+                    <td>92.89</td>
+                    <td>86.82</td>
+                    <td>92.18</td>
+                    <td>91.29</td>
+                    <td>85.61</td>
+                </tr>
+                <tr>
+                    <td>LAMB (LoRA)</td>
+                    <td>4</td>
+                    <td>61.51</td>
+                    <td>90.33</td>
+                    <td>89.46</td>
+                    <td>74.73</td>
+                    <td>94.27</td>
+                    <td>87.51</td>
+                    <td>92.48</td>
+                    <td>91.57</td>
+                    <td>85.23</td>
+                </tr>
+                <tr>
+                    <td>DoRA</td>
+                    <td>4</td>
+                    <td>60.38</td>
+                    <td>90.50</td>
+                    <td>88.24</td>
+                    <td>74.73</td>
+                    <td>93.69</td>
+                    <td>92.59</td>
+                    <td>92.68</td>
+                    <td>92.68</td>
+                    <td>85.89</td>
+                </tr>
+                <tr>
+                    <td>GaLore (LoRA)</td>
+                    <td>4</td>
+                    <td>60.35</td>
+                    <td>90.73</td>
+                    <td>92.25</td>
+                    <td>79.42</td>
+                    <td>94.04</td>
+                    <td>87.00</td>
+                    <td>92.24</td>
+                    <td>91.06</td>
+                    <td>85.89</td>
+                </tr>
+                <tr>
+                    <td>AdamW+SGG</td>
+                    <td>4</td>
+                    <td><span style="background-color: #E6F7FF; color: #007BFF;">62.36</span></td>
+                    <td><span style="background-color: #E6F7FF; color: #007BFF;">91.10</span></td>
+                    <td><span style="background-color: #E6F7FF; color: #007BFF;">92.12</span></td>
+                    <td><span style="background-color: #E6F7FF; color: #007BFF;">80.51</span></td>
+                    <td><span style="background-color: #E6F7FF; color: #007BFF;">95.06</span></td>
+                    <td><span style="background-color: #E6F7FF; color: #007BFF;">88.18</span></td>
+                    <td><span style="background-color: #E6F7FF; color: #007BFF;">92.62</span></td>
+                    <td><span style="background-color: #E6F7FF; color: #007BFF;">93.06</span></td>
+                    <td><span style="background-color: #E6F7FF; color: #007BFF;">86.88</span></td>
+                </tr>
+                <tr>
+                    <td>LAMB+SGG</td>
+                    <td>4</td>
+                    <td><span style="background-color: #E6F7FF; color: #007BFF;">62.47</span></td>
+                    <td><span style="background-color: #E6F7FF; color: #007BFF;">90.90</span></td>
+                    <td><span style="background-color: #E6F7FF; color: #007BFF;">89.46</span></td>
+                    <td><span style="background-color: #E6F7FF; color: #007BFF;">75.53</span></td>
+                    <td><span style="background-color: #E6F7FF; color: #007BFF;">94.95</span></td>
+                    <td><span style="background-color: #E6F7FF; color: #007BFF;">87.73</span></td>
+                    <td><span style="background-color: #E6F7FF; color: #007BFF;">92.92</span></td>
+                    <td><span style="background-color: #E6F7FF; color: #007BFF;">91.78</span></td>
+                    <td><span style="background-color: #E6F7FF; color: #007BFF;">85.72</span></td>
+                </tr>
+                <tr>
+                    <td>SGD (LoRA)</td>
+                    <td>8</td>
+                    <td>60.57</td>
+                    <td>90.29</td>
+                    <td>88.48</td>
+                    <td>79.42</td>
+                    <td>94.32</td>
+                    <td>87.44</td>
+                    <td>92.23</td>
+                    <td>92.10</td>
+                    <td>85.61</td>
+                </tr>
+                <tr>
+                    <td>AdamW (LoRA)</td>
+                    <td>8</td>
+                    <td>61.83</td>
+                    <td>90.80</td>
+                    <td>91.90</td>
+                    <td>79.06</td>
+                    <td>93.46</td>
+                    <td>86.94</td>
+                    <td>92.25</td>
+                    <td>91.22</td>
+                    <td>85.93</td>
+                </tr>
+                <tr>
+                    <td>LAMB (LoRA)</td>
+                    <td>8</td>
+                    <td>61.89</td>
+                    <td>90.78</td>
+                    <td>89.21</td>
+                    <td>79.42</td>
+                    <td>94.61</td>
+                    <td>87.61</td>
+                    <td>92.51</td>
+                    <td>91.42</td>
+                    <td>85.35</td>
+                </tr>
+                <tr>
+                    <td>DoRA</td>
+                    <td>8</td>
+                    <td>58.36</td>
+                    <td>90.63</td>
+                    <td>88.97</td>
+                    <td>75.09</td>
+                    <td>93.81</td>
+                    <td>92.68</td>
+                    <td>92.68</td>
+                    <td>92.68</td>
+                    <td>85.94</td>
+                </tr>
+                <tr>
+                    <td>GaLore (LoRA)</td>
+                    <td>8</td>
+                    <td>60.06</td>
+                    <td>90.82</td>
+                    <td>92.01</td>
+                    <td>79.78</td>
+                    <td>94.38</td>
+                    <td>87.17</td>
+                    <td>92.20</td>
+                    <td>91.11</td>
+                    <td>85.94</td>
+                </tr>
+                <tr>
+                    <td>AdamW+SGG</td>
+                    <td>8</td>
+                    <td><span style="background-color: #E6F7FF; color: #007BFF;">62.36</span></td>
+                    <td><span style="background-color: #E6F7FF; color: #007BFF;">91.10</span></td>
+                    <td><span style="background-color: #E6F7FF; color: #007BFF;">92.12</span></td>
+                    <td><span style="background-color: #E6F7FF; color: #007BFF;">80.51</span></td>
+                    <td><span style="background-color: #E6F7FF; color: #007BFF;">95.06</span></td>
+                    <td><span style="background-color: #E6F7FF; color: #007BFF;">88.17</span></td>
+                    <td><span style="background-color: #E6F7FF; color: #007BFF;">92.65</span></td>
+                    <td><span style="background-color: #E6F7FF; color: #007BFF;">92.85</span></td>
+                    <td><span style="background-color: #E6F7FF; color: #007BFF;">86.85</span></td>
+                </tr>
+                <tr>
+                    <td>LAMB+SGG</td>
+                    <td>8</td>
+                    <td><span style="background-color: #E6F7FF; color: #007BFF;">62.47</span></td>
+                    <td><span style="background-color: #E6F7FF; color: #007BFF;">90.90</span></td>
+                    <td><span style="background-color: #E6F7FF; color: #007BFF;">89.46</span></td>
+                    <td><span style="background-color: #E6F7FF; color: #007BFF;">76.53</span></td>
+                    <td><span style="background-color: #E6F7FF; color: #007BFF;">94.95</span></td>
+                    <td><span style="background-color: #E6F7FF; color: #007BFF;">87.85</span></td>
+                    <td><span style="background-color: #E6F7FF; color: #007BFF;">92.87</span></td>
+                    <td><span style="background-color: #E6F7FF; color: #007BFF;">91.78</span></td>
+                    <td><span style="background-color: #E6F7FF; color: #007BFF;">85.85</span></td>
+                </tr>
+            </tbody>
+        </table>
+        <h3 class="subtitle is-5" style="text-align:center; font-size: 1em;">PEFT on Commonsense Reasoning</h3>
+        <table class="table is-fullwidth">
+            <caption style="caption-side: top; font-weight: bold; text-align: center;">Table 6: LLaMA-7B PEFT Results on Commonsense Reasoning. Comparison of LoRA+SGG (blue background) against baselines. Top-1 accuracy (%↑: higher is better) of selected tasks and all tasks on average (Avg.) are reported. Bold and green types denote the best results and gains↑ compared to LoRA (gray background).</caption>
+            <thead>
+                <tr>
+                    <th>Method</th>
+                    <th>BoolQ</th>
+                    <th>PIQA</th>
+                    <th>SIQA</th>
+                    <th>WG</th>
+                    <th>Arc-E</th>
+                    <th>OBQA</th>
+                    <th>Avg.</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td>Parallel</td>
+                    <td>67.9</td>
+                    <td>76.4</td>
+                    <td>78.8</td>
+                    <td>78.9</td>
+                    <td>73.7</td>
+                    <td>75.2</td>
+                    <td>72.2</td>
+                </tr>
+                <tr>
+                    <td>LoRA</td>
+                    <td>68.9</td>
+                    <td>80.7</td>
+                    <td>77.4</td>
+                    <td>78.8</td>
+                    <td>77.8</td>
+                    <td>74.8</td>
+                    <td>74.7</td>
+                </tr>
+                <tr>
+                    <td>DoRA</td>
+                    <td>69.7</td>
+                    <td>83.4</td>
+                    <td>78.6</td>
+                    <td>81.0</td>
+                    <td>81.9</td>
+                    <td>79.2</td>
+                    <td>78.4</td>
+                </tr>
+                <tr>
+                    <td>GaLore</td>
+                    <td>69.5</td>
+                    <td>82.0</td>
+                    <td>75.1</td>
+                    <td>18.0</td>
+                    <td>80.7</td>
+                    <td>78.0</td>
+                    <td>62.7</td>
+                </tr>
+                <tr>
+                    <td>Fira</td>
+                    <td>69.4</td>
+                    <td>82.6</td>
+                    <td>78.0</td>
+                    <td>81.2</td>
+                    <td>82.2</td>
+                    <td>80.8</td>
+                    <td>76.9</td>
+                </tr>
+                <tr>
+                    <td>LoRA+SGG</td>
+                    <td><span style="background-color: #E6F7FF; color: #007BFF;">70.3</span></td>
+                    <td><span style="background-color: #E6F7FF; color: #007BFF;">83.6</span></td>
+                    <td><span style="background-color: #E6F7FF; color: #007BFF;">78.8</span></td>
+                    <td><span style="background-color: #E6F7FF; color: #007BFF;">80.9</span></td>
+                    <td><span style="background-color: #E6F7FF; color: #007BFF;">81.5</span></td>
+                    <td><span style="background-color: #E6F7FF; color: #007BFF;">79.0</span></td>
+                    <td><span style="background-color: #E6F7FF; color: #007BFF;">77.6</span></td>
+                </tr>
+                <tr>
+                    <td>∆ Gains</td>
+                    <td>+1.4</td>
+                    <td>+2.9</td>
+                    <td>+1.4</td>
+                    <td>+2.1</td>
+                    <td>+3.7</td>
+                    <td>+4.2</td>
+                    <td>+2.9</td>
+                </tr>
+                <tr>
+                    <td>DoRA+SGG</td>
+                    <td><span style="background-color: #E6F7FF; color: #007BFF;">71.4</span></td>
+                    <td><span style="background-color: #E6F7FF; color: #007BFF;">84.8</span></td>
+                    <td><span style="background-color: #E6F7FF; color: #007BFF;">79.5</span></td>
+                    <td><span style="background-color: #E6F7FF; color: #007BFF;">82.8</span></td>
+                    <td><span style="background-color: #E6F7FF; color: #007BFF;">83.8</span></td>
+                    <td><span style="background-color: #E6F7FF; color: #007BFF;">81.2</span></td>
+                    <td><span style="background-color: #E6F7FF; color: #007BFF;">79.6</span></td>
+                </tr>
+                <tr>
+                    <td>∆ Gains</td>
+                    <td>+1.7</td>
+                    <td>+1.4</td>
+                    <td>+0.9</td>
+                    <td>+1.8</td>
+                    <td>+1.9</td>
+                    <td>+2.0</td>
+                    <td>+1.2</td>
+                </tr>
+            </tbody>
+        </table>
+        <h3 class="subtitle is-5" style="text-align:center; font-size: 1em;">DPO</h3>
+        <table class="table is-fullwidth">
+            <caption style="caption-side: top; font-weight: bold; text-align: center;">Table 7: Qwen2.5-0.5B DPO Results with full-rank and LoRA setups. Top-1 accuracy(%)↑ is reported. Bold and green types denote best results and relative gains.</caption>
+            <thead>
+                <tr>
+                    <th>Optimizer</th>
+                    <th>Full-Rank</th>
+                    <th>LoRA</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td>SGD</td>
+                    <td>70.10</td>
+                    <td>69.73</td>
+                </tr>
+                <tr>
+                    <td>AdamW</td>
+                    <td>71.39</td>
+                    <td>70.22</td>
+                </tr>
+                <tr>
+                    <td>LAMB</td>
+                    <td>70.82</td>
+                    <td>70.39</td>
+                </tr>
+                <tr>
+                    <td>SGD+SGG</td>
+                    <td><span style="background-color: #E6F7FF; color: #007BFF;">70.82</span></td>
+                    <td><span style="background-color: #E6F7FF; color: #007BFF;">70.76</span></td>
+                </tr>
+                <tr>
+                    <td>AdamW+SGG</td>
+                    <td><span style="background-color: #E6F7FF; color: #007BFF;">71.85</span></td>
+                    <td><span style="background-color: #E6F7FF; color: #007BFF;">72.02</span></td>
+                </tr>
+                <tr>
+                    <td>LAMB+SGG</td>
+                    <td><span style="background-color: #E6F7FF; color: #007BFF;">71.32</span></td>
+                    <td><span style="background-color: #E6F7FF; color: #007BFF;">71.28</span></td>
+                </tr>
+            </tbody>
+        </table>
+        <h2 class="subtitle is-4" style="text-align:center; font-size: 1.1em;">3.3 Comparison Results with MLLMs</h2>
+        <h3 class="subtitle is-5" style="text-align:center; font-size: 1em;">Full-Rank SFT</h3>
+        <table class="table is-fullwidth">
+            <caption style="caption-side: top; font-weight: bold; text-align: center;">Table 8: MLLM performance comparison on diverse benchmarks with LLaVA variants and different optimizers. Top-1 accuracy (%)↑ for selected tasks and all-task averaged (Avg.) results are reported. MMB and MMBCN denote MMbench and MMbench (Chinese). Bold and green types denote the best results and gains↓ of SGG (blue background) over related baselines (gray background). Please view Table A6 for the full results.</caption>
+            <thead>
+                <tr>
+                    <th>Optimizer</th>
+                    <th>Image Question Answering Benchmarks</th>
+                    <th>Avg.</th>
+                    <th>GQA</th>
+                    <th>VizWiz</th>
+                    <th>SciVQAI</th>
+                    <th>VQAT</th>
+                    <th>MMB</th>
+                    <th>MMBCN</th>
+                    <th>POPE</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td>BLIP-2</td>
+                    <td>41.0</td>
+                    <td>19.6</td>
+                    <td>61.0</td>
+                    <td>42.5</td>
+                    <td>-</td>
+                    <td>-</td>
+                    <td>85.3</td>
+                    <td>-</td>
+                </tr>
+                <tr>
+                    <td>InstructBLIP</td>
+                    <td>49.2</td>
+                    <td>34.5</td>
+                    <td>60.5</td>
+                    <td>50.1</td>
+                    <td>36.0</td>
+                    <td>23.7</td>
+                    <td>79.8</td>
+                    <td>47.7</td>
+                </tr>
+                <tr>
+                    <td>Qwen-VL</td>
+                    <td>59.3</td>
+                    <td>35.2</td>
+                    <td>67.1</td>
+                    <td>63.8</td>
+                    <td>38.2</td>
+                    <td>-</td>
+                    <td>-</td>
+                    <td>-</td>
+                </tr>
+                <tr>
+                    <td>TinyLLaVA</td>
+                    <td>62.0</td>
+                    <td>-</td>
+                    <td>69.1</td>
+                    <td>59.1</td>
+                    <td>66.9</td>
+                    <td>-</td>
+                    <td>86.4</td>
+                    <td>-</td>
+                </tr>
+                <tr>
+                    <td>MoE-LLaVA</td>
+                    <td>62.6</td>
+                    <td>-</td>
+                    <td>70.3</td>
+                    <td>57.0</td>
+                    <td>68.0</td>
+                    <td>-</td>
+                    <td>85.7</td>
+                    <td>-</td>
+                </tr>
+                <tr>
+                    <td>LLaVA-Phi</td>
+                    <td>-</td>
+                    <td>-</td>
+                    <td>68.4</td>
+                    <td>48.6</td>
+                    <td>59.8</td>
+                    <td>-</td>
+                    <td>85.0</td>
+                    <td>-</td>
+                </tr>
+                <tr>
+                    <td>LLaVA-NeXT</td>
+                    <td>64.2</td>
+                    <td>57.6</td>
+                    <td>70.1</td>
+                    <td>64.9</td>
+                    <td>67.4</td>
+                    <td>60.6</td>
+                    <td>86.5</td>
+                    <td>67.3</td>
+                </tr>
+                <tr>
+                    <td>LLaVA-MOD</td>
+                    <td>58.7</td>
+                    <td>39.2</td>
+                    <td>68.0</td>
+                    <td>58.5</td>
+                    <td>66.3</td>
+                    <td>61.9</td>
+                    <td>87.0</td>
+                    <td>62.8</td>
+                </tr>
+                <tr>
+                    <td>LLaVA-KD-2B</td>
+                    <td>62.3</td>
+                    <td>44.7</td>
+                    <td>64.7</td>
+                    <td>53.4</td>
+                    <td>64.0</td>
+                    <td>63.7</td>
+                    <td>86.3</td>
+                    <td>62.7</td>
+                </tr>
+                <tr>
+                    <td>LLaVA-v1.5</td>
+                    <td>62.0</td>
+                    <td>50.0</td>
+                    <td>66.8</td>
+                    <td>58.2</td>
+                    <td>64.3</td>
+                    <td>58.3</td>
+                    <td>85.9</td>
+                    <td>63.6</td>
+                </tr>
+                <tr>
+                    <td>AdamW+SGG</td>
+                    <td><span style="background-color: #E6F7FF; color: #007BFF;">62.4</span></td>
+                    <td><span style="background-color: #E6F7FF; color: #007BFF;">50.2</span></td>
+                    <td><span style="background-color: #E6F7FF; color: #007BFF;">69.8</span></td>
+                    <td><span style="background-color: #E6F7FF; color: #007BFF;">57.4</span></td>
+                    <td><span style="background-color: #E6F7FF; color: #007BFF;">65.9</span></td>
+                    <td><span style="background-color: #E6F7FF; color: #007BFF;">60.1</span></td>
+                    <td><span style="background-color: #E6F7FF; color: #007BFF;">86.3</span></td>
+                    <td><span style="background-color: #E6F7FF; color: #007BFF;">64.6</span></td>
+                </tr>
+                <tr>
+                    <td>∆ Gains</td>
+                    <td>+0.4</td>
+                    <td>+0.2</td>
+                    <td>+3.0</td>
+                    <td>-0.8</td>
+                    <td>+1.6</td>
+                    <td>+1.8</td>
+                    <td>+0.4</td>
+                    <td>+1.0</td>
+                </tr>
+                <tr>
+                    <td>Adafactor+SGG</td>
+                    <td><span style="background-color: #E6F7FF; color: #007BFF;">62.8</span></td>
+                    <td><span style="background-color: #E6F7FF; color: #007BFF;">50.6</span></td>
+                    <td><span style="background-color: #E6F7FF; color: #007BFF;">71.6</span></td>
+                    <td><span style="background-color: #E6F7FF; color: #007BFF;">57.3</span></td>
+                    <td><span style="background-color: #E6F7FF; color: #007BFF;">66.3</span></td>
+                    <td><span style="background-color: #E6F7FF; color: #007BFF;">60.8</span></td>
+                    <td><span style="background-color: #E6F7FF; color: #007BFF;">86.0</span></td>
+                    <td><span style="background-color: #E6F7FF; color: #007BFF;">65.1</span></td>
+                </tr>
+                <tr>
+                    <td>∆ Gains</td>
+                    <td>+0.1</td>
+                    <td>+2.4</td>
+                    <td>+0.9</td>
+                    <td>+0.2</td>
+                    <td>+0.2</td>
+                    <td>+0.4</td>
+                    <td>+0.0</td>
+                    <td>+0.6</td>
+                </tr>
+                <tr>
+                    <td>LAMB+SGG</td>
+                    <td><span style="background-color: #E6F7FF; color: #007BFF;">44.0</span></td>
+                    <td><span style="background-color: #E6F7FF; color: #007BFF;">53.3</span></td>
+                    <td><span style="background-color: #E6F7FF; color: #007BFF;">61.8</span></td>
+                    <td><span style="background-color: #E6F7FF; color: #007BFF;">43.5</span></td>
+                    <td><span style="background-color: #E6F7FF; color: #007BFF;">43.3</span></td>
+                    <td><span style="background-color: #E6F7FF; color: #007BFF;">41.9</span></td>
+                    <td><span style="background-color: #E6F7FF; color: #007BFF;">81.3</span></td>
+                    <td><span style="background-color: #E6F7FF; color: #007BFF;">52.7</span></td>
+                </tr>
+                <tr>
+                    <td>∆ Gains</td>
+                    <td>+0.2</td>
+                    <td>+0.0</td>
+                    <td>+0.3</td>
+                    <td>+0.1</td>
+                    <td>+0.1</td>
+                    <td>+0.1</td>
+                    <td>+0.1</td>
+                    <td>+0.1</td>
+                </tr>
+            </tbody>
+        </table>
+        <h3 class="subtitle is-5" style="text-align:center; font-size: 1em;">Low-Rank SFT (AdamW)</h3>
+        <table class="table is-fullwidth">
+            <caption style="caption-side: top; font-weight: bold; text-align: center;">Table 8 (cont.)</caption>
+            <thead>
+                <tr>
+                    <th>Optimizer</th>
+                    <th>Image Question Answering Benchmarks</th>
+                    <th>Avg.</th>
+                    <th>GQA</th>
+                    <th>VizWiz</th>
+                    <th>SciVQAI</th>
+                    <th>VQAT</th>
+                    <th>MMB</th>
+                    <th>MMBCN</th>
+                    <th>POPE</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td>LLaVA-v1.5</td>
+                    <td>63.0</td>
+                    <td>47.8</td>
+                    <td>68.4</td>
+                    <td>58.2</td>
+                    <td>66.1</td>
+                    <td>58.9</td>
+                    <td>86.4</td>
+                    <td>64.1</td>
+                </tr>
+                <tr>
+                    <td>LoRA+SGG</td>
+                    <td><span style="background-color: #E6F7FF; color: #007BFF;">63.4</span></td>
+                    <td><span style="background-color: #E6F7FF; color: #007BFF;">51.0</span></td>
+                    <td><span style="background-color: #E6F7FF; color: #007BFF;">70.1</span></td>
+                    <td><span style="background-color: #E6F7FF; color: #007BFF;">58.6</span></td>
+                    <td><span style="background-color: #E6F7FF; color: #007BFF;">66.7</span></td>
+                    <td><span style="background-color: #E6F7FF; color: #007BFF;">59.4</span></td>
+                    <td><span style="background-color: #E6F7FF; color: #007BFF;">86.6</span></td>
+                    <td><span style="background-color: #E6F7FF; color: #007BFF;">65.1</span></td>
+                </tr>
+                <tr>
+                    <td>∆ Gains</td>
+                    <td>+0.4</td>
+                    <td>+2.2</td>
+                    <td>+1.5</td>
+                    <td>+0.4</td>
+                    <td>+0.6</td>
+                    <td>+0.5</td>
+                    <td>+0.2</td>
+                    <td>+1.0</td>
+                </tr>
+            </tbody>
+        </table>
+        <h3 class="subtitle is-5" style="text-align:center; font-size: 1em;">8-bit Low-Rank SFT (AdamW)</h3>
+        <table class="table is-fullwidth">
+            <caption style="caption-side: top; font-weight: bold; text-align: center;">Table 8 (cont.)</caption>
+            <thead>
+                <tr>
+                    <th>Optimizer</th>
+                    <th>Image Question Answering Benchmarks</th>
+                    <th>Avg.</th>
+                    <th>GQA</th>
+                    <th>VizWiz</th>
+                    <th>SciVQAI</th>
+                    <th>VQAT</th>
+                    <th>MMB</th>
+                    <th>MMBCN</th>
+                    <th>POPE</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td>LLaVA-v1.5</td>
+                    <td>54.3</td>
+                    <td>50.7</td>
+                    <td>66.4</td>
+                    <td>52.5</td>
+                    <td>56.0</td>
+                    <td>49.8</td>
+                    <td>82.9</td>
+                    <td>58.9</td>
+                </tr>
+                <tr>
+                    <td>Q-LoRA+SGG</td>
+                    <td><span style="background-color: #E6F7FF; color: #007BFF;">55.1</span></td>
+                    <td><span style="background-color: #E6F7FF; color: #007BFF;">51.3</span></td>
+                    <td><span style="background-color: #E6F7FF; color: #007BFF;">66.7</span></td>
+                    <td><span style="background-color: #E6F7FF; color: #007BFF;">53.0</span></td>
+                    <td><span style="background-color: #E6F7FF; color: #007BFF;">56.1</span></td>
+                    <td><span style="background-color: #E6F7FF; color: #007BFF;">51.0</span></td>
+                    <td><span style="background-color: #E6F7FF; color: #007BFF;">83.4</span></td>
+                    <td><span style="background-color: #E6F7FF; color: #007BFF;">59.5</span></td>
+                </tr>
+                <tr>
+                    <td>∆ Gains</td>
+                    <td>+0.8</td>
+                    <td>+0.6</td>
+                    <td>+0.3</td>
+                    <td>+0.5</td>
+                    <td>+0.1</td>
+                    <td>+0.2</td>
+                    <td>+0.5</td>
+                    <td>+0.6</td>
+                </tr>
+            </tbody>
+        </table>
+        <h2 class="subtitle is-4" style="text-align:center; font-size: 1.1em;">3.4 Robustness to Learning Rate Scaling-up</h2>
+        <p>
+            Adam-like optimizers often struggle with the interplay between learning rate (LR) and batch size, leading to training instability. In contrast, SGG shows exceptional robustness in this regard. During SFT on Alpaca with Adam, SGG maintains stable validation loss across a wide spectrum of batch sizes (128 to 4096) and learning rates, even under extreme conditions like batch sizes of 4096 and LR of 0.1.
+        </p>
+        <figure class="image">
+            <img src="https://via.placeholder.com/600x400" alt="Learning Rate and Batch Size Scaling-up with Qwen2.5-0.5B SFT on Alpaca">
+            <figcaption style="font-weight: bold; text-align: center;">Figure 5: Learning Rate and Batch Size Scaling-up with Qwen2.5-0.5B SFT on Alpaca. Validation loss↓ vs SFT Learning Rate for Adam and Adam+SGG across various batch sizes (128 to 4096). SGG offers consistent robustness over a wider range of hyper-parameters.</figcaption>
+        </figure>
+        <h2 class="subtitle is-4" style="text-align:center; font-size: 1.1em;">3.5 Ablation Studies</h2>
+        <p>
+            We analyze the three key hyper-parameters in SGG: cluster number, recluster interval, and scaling decay.
+        </p>
+        <h3 class="subtitle is-5" style="text-align:center; font-size: 1em;">Cluster Number</h3>
+        <table class="table is-fullwidth">
+            <caption style="caption-side: top; font-weight: bold; text-align: center;">Table 9: Ablation studies of the number of SGG clusters K (task-relevant) across different tasks and models. ERR denotes the mini-batch K-means running errors.</caption>
+            <thead>
+                <tr>
+                    <th>Task</th>
+                    <th>Model</th>
+                    <th>K=1 (Adam)</th>
+                    <th>K=2</th>
+                    <th>K=3</th>
+                    <th>K=4</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td>C4</td>
+                    <td>LLaMA-60M</td>
+                    <td>34.1</td>
+                    <td>30.3</td>
+                    <td>30.8</td>
+                    <td>ERR</td>
+                </tr>
+                <tr>
+                    <td>C4</td>
+                    <td>LLaMA-130M</td>
+                    <td>25.1</td>
+                    <td>23.3</td>
+                    <td>23.5</td>
+                    <td>ERR</td>
+                </tr>
+                <tr>
+                    <td>GLUE (MNLI)</td>
+                    <td>RoBERT-Base</td>
+                    <td>87.2</td>
+                    <td>88.3</td>
+                    <td>87.9</td>
+                    <td>ERR</td>
+                </tr>
+                <tr>
+                    <td>MLLM</td>
+                    <td>LLaVA-1.5-7B</td>
+                    <td>63.6</td>
+                    <td>64.2</td>
+                    <td>64.5</td>
+                    <td>64.3</td>
+                </tr>
+            </tbody>
+</table>
+<h3 class="subtitle is-5" style="text-align:center; font-size: 1em;">Recluster Interval</h3>
+<figure class="image">
+<img src="https://via.placeholder.com/600x400" alt="Recluster Interval T">
+<figcaption style="font-weight: bold; text-align: center;">Figure 6(a): Ablation of Recluster Interval T. Validation Perplexity (PPL %↓: lower is better) vs. Recluster Interval T (% total iterations) for LLaMA-60M and LLaMA-130M pre-training on C4. The results demonstrate that T ≈ 500 (10% of total iterations) is a favorable setting for SGG.</figcaption>
+</figure>
+<h3 class="subtitle is-5" style="text-align:center; font-size: 1em;">Scaling Decay</h3>
+<figure class="image">
+<img src="https://via.placeholder.com/600x400" alt="Scaling Decay β3">
+<figcaption style="font-weight: bold; text-align: center;">Figure 6(b): Ablation of Scaling Decay β3. Validation Perplexity (PPL %↓: lower is better) vs. Scaling Decay β3 for LLaMA-60M and LLaMA-130M pre-training on C4. The results show that β3 = 0.99 is a robust choice for SGG.</figcaption>
+</figure>
+</div>
 </section>
   
 </section>
