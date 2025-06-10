@@ -332,9 +332,6 @@
   <section class="section" id="overview">
     <div class="container" style="max-width: 960px; margin: 0 auto;">
       <h1 class="title is-3">Abstract</h1>
-      <div style="text-align: center; margin: 2rem 0;">
-        <img src="website/img/SGG_2.png" alt="SGG Framework Overview" style="width: 60%; height: auto;" />
-      </div>
       <div class="content has-text-justified">
         <p>
           Training large language models (LLMs) poses challenges due to their massive scale and heterogeneous architectures. While adaptive optimizers like AdamW help address gradient variations, they still struggle with efficient and effective parameter-wise learning rate estimation, resulting in training instability, slow convergence, and poor compatibility with parameter-efficient fine-tuning (PEFT) techniques. This work introduces <span class="sgg">Scaling with Gradient Grouping</span> (SGG), an optimizer wrapper that improves adaptive learning rate estimation by dynamic grouping and group-specific scaling. SGG first groups gradient statistics in each layer into clusters and then applies cluster-specific scaling to calibrate learning rates for each parameter, thus imposing collective group-wise constraints while maintaining precise per-parameter adaptation.
@@ -347,6 +344,9 @@
   <section class="section" id="Method">
     <div class="container is-max-desktop content">
       <h1 class="title is-3">Method</h1>
+      <div style="text-align: center; margin: 2rem 0;">
+        <img src="website/img/SGG_2.png" alt="SGG Framework Overview" style="width: 60%; height: auto;" />
+      </div>
       <p>The key steps of SGG are as follows:</p>
       <ol>
         <li>Dynamic Gradient Grouping: SGG dynamically clusters gradient statistics (specifically momentum vectors) in each layer into K groups using online clustering algorithms such as mini-batch K-means.</li>
