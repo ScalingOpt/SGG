@@ -251,7 +251,7 @@
   <!-- Overview Section -->
   <section class="section" id="overview" style="padding-top:1.5rem;">
     <div class="container" style="max-width: 80%; margin: 0 auto;">
-      <h1 class="title is-3" style="text-align:center; font-size: 2.3em; margin-bottom:1rem;">Overview</h1>
+      <h1 class="title is-3" style="text-align:center; font-size: 2.3em; margin-bottom:1rem;">Abstract</h1>
       <br>
       <!-- 图片单独居中展示，并缩小 -->
       <div style="text-align: center; margin: 2rem 0;">
@@ -270,30 +270,15 @@
     <div class="container is-max-desktop content" style="max-width: 80%; margin: 0 auto -0.1rem auto;">
         <h1 class="title is-3" style="text-align:center; font-size: 2.3em;">Method</h1>
         <p>
-            Training large language models (LLMs) poses challenges due to their massive scale and heterogeneous architectures. While adaptive optimizers like AdamW help address gradient variations, they still struggle with efficient and effective parameter-wise learning rate estimation, resulting in training instability, slow convergence, and poor compatibility with parameter-efficient fine-tuning (PEFT) techniques. This work introduces Scaling with Gradient Grouping (SGG), an optimizer wrapper that improves adaptive learning rate estimation by dynamic grouping and group-specific scaling.
+            The key steps of SGG are as follows:
         </p>
-        <p>
-            SGG first groups gradient statistics in each layer into clusters and then applies cluster-specific scaling to calibrate learning rates for each parameter, thus imposing collective group-wise constraints while maintaining precise per-parameter adaptation. Experiments on diverse (M)LLM benchmarks show that SGG integrates seamlessly with existing optimizers, and offers consistent gains and faster convergence over baselines, with various model sizes. Its stability across varying batch sizes and learning rates establishes SGG as a robust choice for LLM optimization.
-        </p>
-        <p>
-            To demonstrate the plug-and-play integration of our SGG, we first outline the essential steps in gradient-based optimizers. The process typically begins with gradient computation. At iteration <math>t</math>, the gradient <math>g_t^l</math> of objective <math>L</math> w.r.t. parameters <math>\theta_{t-1}^l</math> of layer <math>l</math> is calculated as:
-            <math>g_t^l = \nabla_{\theta_{t-1}^l} L(\theta_{t-1}^l, D)</math>
-            where <math>D</math> denotes the training dataset, and <math>\theta_{t-1}^l</math> is from the previous iteration. Subsequently, historical gradient information is incorporated to stabilize the update, commonly referred to as momentum <math>m_t^l</math>. While vanilla SGD uses the current gradient instead (<math>m_t^l = g_t^l</math>), momentum-based methods often employ an exponential moving average (EMA) to smooth estimates over time:
-            <math>m_t^l = \text{MomentumEstimate}(g_t^l, m_{t-1}^l, \beta_1)</math>
-            where <math>m_{t-1}^l</math> is from the last iteration, and the EMA decay <math>\beta_1</math> controls the retention of past gradients.
-        </p>
-        <p>
-            Adaptive learning rate algorithms further refine the process by calculating parameter-wise or layer-wise second-moment estimates of gradients to calibrate step sizes:
-            <math>\alpha_t^l = \text{LREstimate}(\alpha_{t-1}^l, m_t^l, \beta_2, \eta_t)</math>
-            where <math>\eta_t</math> indicates the global learning rate set by scheduler at iteration <math>t</math>, and <math>\beta_2</math> is the EMA decay like <math>\beta_1</math>. Non-adaptive methods, in contrast, simply use the global one instead (<math>\alpha_t^l = \eta_t</math>). Note that this learning rate adaptation typically increases memory overhead, particularly for large-scale models – a key challenge that most prior works aim to address.
-        </p>
-        <p>
-            SGG begins with dynamic grouping as GradCluster(<math>m_t^l</math>, <math>K</math>), which partitions momentum vectors <math>m_t^l</math> within each layer <math>l</math> into <math>K</math> groups with related indices <math>C_t^l</math> according to their similarity. To achieve this, online clustering stands out as a straightforward solution, and the choice of specific clustering algorithms is then crucial for both effectiveness and efficiency. As such, we evaluate several potential strategies, including K-means, mini-batch K-means, Gaussian Mixture Models (GMM), and DBSCAN. Ablation studies show that mini-batch K-means offer the most favorable trade-off between clustering quality and computational efficiency. Thus, we select this as the default clustering implementation of GradCluster(<math>m_t^l</math>, <math>K</math>) in SGG.
-        </p>
-        <p>
-            We introduce ScaleUpdate(<math>C_t^l</math>, <math>g_t^l</math>, <math>\beta_3</math>) to calculate the scaling factor <math>S_t^l[c]</math> for each cluster <math>c</math> after grouping, which modulates learning rate <math>\alpha_t^l</math>. This involves two sub-tasks: (i) measuring the statistics for different levels of partitions (e.g., clusters, layers, and even the global one); (ii) updating cluster-specific scales <math>S_t^l[c]</math> based on the above statistics. This contrasts with the previous Adam-mini, which replaces per-parameter adaptive learning rates with their group-wise means directly.
-        </p>
+        <ol>
+            <li>Dynamic Gradient Grouping: SGG dynamically clusters gradient statistics (specifically momentum vectors) in each layer into K groups using online clustering algorithms such as mini-batch K-means.</li>
+            <li>Cluster-specific Learning Rate Scaling: After grouping, SGG calculates a scaling factor for each cluster based on the deviation of the cluster's statistics relative to the layer's and the entire model's global statistics. This scaling factor modulates the learning rate for each parameter in the cluster.</li>
+            <li>Parameter Update: The scaled learning rates are then used to update the model parameters, ensuring that each parameter adapts its learning rate based on its group's characteristics while maintaining individual parameter adaptation.</li>
+        </ol>
     </div>
+</section>
 </section>
   <!-- BibTeX Section -->
   <section class="section" id="BibTeX" style="padding-top:1.5rem;">
