@@ -253,10 +253,6 @@
     <div class="container" style="max-width: 80%; margin: 0 auto;">
       <h1 class="title is-3" style="text-align:center; font-size: 2.3em; margin-bottom:1rem;">Abstract</h1>
       <br>
-      <!-- 图片单独居中展示，并缩小 -->
-      <div style="text-align: center; margin: 2rem 0;">
-        <img src="website/img/SGG_2.png" alt="SGG Framework Overview" style="width: 50%; height: auto; display: inline-block;">
-      </div>
       <div class="content has-text-justified" style="max-width: 85%; font-size: 1.2em; margin: 0 auto; line-height: 1.55;">
         <p style="text-align:justify; color:rgb(31, 30, 30);">
           Training large language models (LLMs) poses challenges due to their massive scale and heterogeneous architectures. While adaptive optimizers like AdamW help address gradient variations, they still struggle with efficient and effective parameter-wise learning rate estimation, resulting in training instability, slow convergence, and poor compatibility with parameter-efficient fine-tuning (PEFT) techniques. This work introduces <span class="sgg">Scaling with Gradient Grouping</span> (SGG), an optimizer wrapper that improves adaptive learning rate estimation by dynamic grouping and group-specific scaling. SGG first groups gradient statistics in each layer into clusters and then applies cluster-specific scaling to calibrate learning rates for each parameter, thus imposing collective group-wise constraints while maintaining precise per-parameter adaptation.
@@ -266,19 +262,26 @@
     </div>
   </section>
 
-  <section class="section" id="Method" style="padding-top:1.5rem;">
-    <div class="container is-max-desktop content" style="max-width: 85%; margin: 0 auto; rem auto;">
-        <h1 class="title is-3" style="text-align:center; font-size: 1.2em;">Method</h1>
-        <p>
-            The key steps of SGG are as follows:
-        </p>
-        <ol>
-            <li>Dynamic Gradient Grouping: SGG dynamically clusters gradient statistics (specifically momentum vectors) in each layer into K groups using online clustering algorithms such as mini-batch K-means.</li>
-            <li>Cluster-specific Learning Rate Scaling: After grouping, SGG calculates a scaling factor for each cluster based on the deviation of the cluster's statistics relative to the layer's and the entire model's global statistics. This scaling factor modulates the learning rate for each parameter in the cluster.</li>
-            <li>Parameter Update: The scaled learning rates are then used to update the model parameters, ensuring that each parameter adapts its learning rate based on its group's characteristics while maintaining individual parameter adaptation.</li>
-        </ol>
+<section class="section" id="Method" style="padding-top:1.5rem;">
+    <div class="container" style="max-width: 80%; margin: 0 auto;">
+        <h1 class="title is-3" style="text-align:center; font-size: 2.3em; margin-bottom:1rem;">Method</h1>
+        <br>
+      <div style="text-align: center; margin: 2rem 0;">
+        <img src="website/img/SGG_2.png" alt="SGG Framework Overview" style="width: 40%; height: auto; display: inline-block;">
+      </div>
+        <div class="content has-text-justified" style="max-width: 85%; font-size: 1.2em; margin: 0 auto; line-height: 1.55;">
+            <p style="text-align:justify; color:rgb(31, 30, 30);">
+                The key steps of SGG are as follows:
+            </p>
+            <ol style="text-align:justify; color:rgb(31, 30, 30);">
+                <li>Dynamic Gradient Grouping: SGG dynamically clusters gradient statistics (specifically momentum vectors) in each layer into K groups using online clustering algorithms such as mini-batch K-means.</li>
+                <li>Cluster-specific Learning Rate Scaling: After grouping, SGG calculates a scaling factor for each cluster based on the deviation of the cluster's statistics relative to the layer's and the entire model's global statistics. This scaling factor modulates the learning rate for each parameter in the cluster.</li>
+                <li>Parameter Update: The scaled learning rates are then used to update the model parameters, ensuring that each parameter adapts its learning rate based on its group's characteristics while maintaining individual parameter adaptation.</li>
+            </ol>
+        </div>
     </div>
 </section>
+  
 </section>
   <!-- BibTeX Section -->
   <section class="section" id="BibTeX" style="padding-top:1.5rem;">
