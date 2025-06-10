@@ -14,7 +14,7 @@
 </div>
 
 <p align="center">
-  <img src="SGG_1.png" width="300"/>
+  <img src="SGG_1.png" width="350"/>
   <img src="SGG_2.png" width="250"/>
 </p>
 
