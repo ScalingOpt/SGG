@@ -1,579 +1,477 @@
 <!DOCTYPE html>
-<html lang="en">
+<html>
+
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Taming LLMs by Scaling Learning Rates with Gradient Grouping</title>
+  <link rel="icon" type="image/png" href="website/img/page_logo.png">
+
+  <title>AlphaOne: Reasoning Models Thinking Slow and Fast at Test Time</title>
+
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-datalabels@2.0.0"></script>
+    <script
+        src="https://cdn.jsdelivr.net/npm/chartjs-plugin-annotation@3.0.1/dist/chartjs-plugin-annotation.min.js"></script>
+
+    <link href="https://fonts.googleapis.com/css?family=Google+Sans|Noto+Sans|Castoro" rel="stylesheet">
+    <link rel="stylesheet" href="website/css/bulma.min.css">
+    <link rel="stylesheet" href="website/css/bulma-carousel.min.css">
+    <link rel="stylesheet" href="website/css/bulma-slider.min.css">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/jpswalsh/academicons@1/css/academicons.min.css">
+    <link rel="stylesheet" href="website/css/fontawesome.all.min.css">
+
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+    <script src="./website/javascript/bulma-carousel.min.js"></script>
+    <script src="./website/javascript/bulma-slider.min.js"></script>
+    <script src="./website/javascript/explorer-index.js"></script>
+
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet"
+        integrity="sha384-1BmE4kWBq78iYhFldvKuhfTAU6auU8tT94WrHftjDbrCEXSU1oBoqyl2QvZ6jIW3" crossorigin="anonymous">
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"
+        integrity="sha384-ka7Sk0Gln4gmtz2MlQnikT1wXgYsOg+OMhuP+IlRH9sENBO0LRn5q+8nbTov4+1p"
+        crossorigin="anonymous"></script>
+
+    <link href="https://unpkg.com/tabulator-tables@5.5.2/dist/css/tabulator_bootstrap4.min.css" rel="stylesheet">
+    <script type="text/javascript" src="https://unpkg.com/tabulator-tables@5.5.2/dist/js/tabulator.min.js"></script>
+    <script defer src="website/javascript/fontawesome.all.min.js"></script>
+    <!-- <script src="website/javascript/peity-vanilla.js"></script> -->
+
+
+    <!-- below we load some js scripts -->
+    <script src="website/javascript/benchmark_table.js" type="module"></script>
+    <script src="https://polyfill.io/v3/polyfill.min.js?features=es6"></script>
+    <script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+
+    <link rel="stylesheet" href="website/css/index.css">
+
+    <!-- Google tag (gtag.js) -->
+    <script async src="https://www.googletagmanager.com/gtag/js?id=G-C7GJ4FYMY9"></script>
+    <script>
+        window.dataLayer = window.dataLayer || [];
+        function gtag() { dataLayer.push(arguments); }
+        gtag('js', new Date());
+
+        gtag('config', 'G-C7GJ4FYMY9');
+    </script>
+
+    <!-- MathJax script -->
+    <script type="text/javascript" async
+        src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.5/MathJax.js?config=TeX-MML-AM_CHTML">
+    </script>
+    <script type="text/javascript">
+        MathJax.Hub.Config({
+            tex2jax: {inlineMath: [['$','$'], ['\\(','\\)']]}
+        });
+    </script>
+
+    <noscript>
+        <p><img alt="Clicky" width="1" height="1" src="//in.getclicky.com/101339888ns.gif" /></p>
+    </noscript>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+        var toggles = document.querySelectorAll('.toggle-section');
+        toggles.forEach(function(toggle) {
+            toggle.addEventListener('click', function() {
+            var content = document.getElementById(toggle.getAttribute('aria-controls'));
+            var toggleIcon = toggle.children[1].children[0];
+            content.classList.toggle('is-active');
+            if (content.classList.contains('is-active')) {
+                toggleIcon.style.transition = 'transform 0.3s ease';
+                toggleIcon.style.transform = 'rotate(180deg)';
+            } else {
+                toggleIcon.style.transition = 'transform 0.3s ease';
+                toggleIcon.style.transform = 'rotate(0deg)';
+            }
+            });
+        });
+        });
+      </script>
+
     <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
+        .collapse-content {
+          display: none;
+          margin-top: 10px;
         }
-
-        body {
-            font-family: "Times New Roman", Times, serif;
-            line-height: 1.6;
-            color: #333;
-            background-color: #f8f9fa;
+        .collapse-content.is-active {
+          display: block;
         }
-
-        .container {
-            max-width: 1200px;
-            margin: 0 auto;
-            padding: 0 20px;
-        }
-
-        header {
-            background: linear-gradient(135deg, #007bff, #0056b3);
-            color: white;
-            padding: 4rem 0;
-            text-align: center;
-            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-        }
-
-        header h1 {
-            font-size: 2.5rem;
-            margin-bottom: 1rem;
-        }
-
-        header p {
-            font-size: 1.2rem;
-            opacity: 0.9;
-        }
-
-        nav {
-            background: #343a40;
-            padding: 1rem 0;
-            position: sticky;
-            top: 0;
-            z-index: 100;
-        }
-
-        nav ul {
-            list-style: none;
-            display: flex;
-            justify-content: center;
-            gap: 2rem;
-        }
-
-        nav a {
-            color: white;
-            text-decoration: none;
-            font-size: 1.1rem;
-            transition: color 0.3s;
-        }
-
-        nav a:hover {
-            color: #007bff;
-        }
-
-        section {
-            padding: 3rem 0;
-        }
-
-        section h2 {
-            font-size: 2rem;
-            color: #343a40;
-            margin-bottom: 1.5rem;
-            text-align: center;
-        }
-
-        section p, section ul {
-            font-size: 1.1rem;
-            margin-bottom: 1rem;
-        }
-
-        ul {
-            list-style: disc;
-            margin-left: 2rem;
-        }
-
-        .buttons {
-            display: flex;
-            justify-content: center;
-            gap: 1.5rem;
-            margin: 2rem 0;
-        }
-
-        .button {
-            display: flex;
-            align-items: center;
-            padding: 0.8rem 1.5rem;
-            background: #007bff;
-            color: white;
-            text-decoration: none;
-            border-radius: 5px;
-            transition: background 0.3s, transform 0.2s;
-            font-size: 1rem;
-        }
-
-        .button img {
-            width: 24px;
-            height: 24px;
-            margin-right: 0.5rem;
-        }
-
-        .button:hover {
-            background: #0056b3;
-            transform: translateY(-2px);
-        }
-
-        table {
-            width: 100%;
-            border-collapse: collapse;
-            margin: 1.5rem 0;
-            background: white;
-            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-        }
-
-        th, td {
-            padding: 0.8rem;
-            border: 1px solid #dee2e6;
-            text-align: center;
-            font-size: 1rem;
-        }
-
-        th {
-            background: #343a40;
-            color: white;
-        }
-
-        tr:nth-child(even) {
-            background: #f8f9fa;
-        }
-
-        footer {
-            background: #343a40;
-            color: white;
-            text-align: center;
-            padding: 1rem 0;
-            margin-top: 2rem;
-        }
-
-        @media (max-width: 768px) {
-            header h1 {
-                font-size: 1.8rem;
-            }
-
-            nav ul {
-                flex-direction: column;
-                text-align: center;
-                gap: 1rem;
-            }
-
-            table {
-                font-size: 0.9rem;
-            }
-
-            th, td {
-                padding: 0.5rem;
-            }
-        }
-    </style>
+        /* .toggle-section .icon.is-small {
+          transition: transform 0.3s ease;
+        } */
+        /* .toggle-section .fa-angle-up {
+          transform: rotate(180deg);
+        } */
+      </style>
 </head>
+
 <body>
-    <header>
-        <div class="container">
-            <h1>Taming LLMs by Scaling Learning Rates with Gradient Grouping</h1>
-            <p>Siyuan Li<sup>1</sup>, Juanxi Tian<sup>1</sup>, Zedong Wang<sup>2</sup>, Xin Jin<sup>3</sup>, Zicheng Liu<sup>4,5,*</sup>, Wentao Zhang<sup>2</sup>, Dan Xu<sup>5</sup><br>
-            <sup>1</sup>Zhejiang University, <sup>2</sup>Peking University, <sup>3</sup>Westlake University, <sup>4</sup>Westlake University, <sup>5</sup>The Hong Kong University of Science and Technology<br>
-            *Corresponding author</p>
-        </div>
-    </header>
 
-    <nav>
-        <ul>
-            <li><a href="#abstract">Abstract</a></li>
-            <li><a href="#overview">Overview</a></li>
-            <li><a href="#methodology">Methodology</a></li>
-            <li><a href="#results">Results</a></li>
-            <li><a href="#links">Links</a></li>
-        </ul>
-    </nav>
+  <!-- Single-line Title with Bulma's .title.is-1 is-bold (centered heading) -->
+  <section class="hero">
+    <div class="hero-body">
+      <div class="container is-max-desktop">
+        <div class="columns is-centered">
+          <div class="column has-text-centered">
 
-    <section id="abstract">
-        <div class="container">
-            <h2>Abstract</h2>
-            <p>Training large language models (LLMs) poses challenges due to their massive scale and heterogeneous architectures. While adaptive optimizers like AdamW help address gradient variations, they still struggle with efficient and effective parameter-wise learning rate estimation, resulting in training instability, slow convergence, and poor compatibility with parameter-efficient fine-tuning (PEFT) techniques. This work introduces Scaling with Gradient Grouping (SGG), an optimizer wrapper that improves adaptive learning rate estimation by dynamic grouping and group-specific scaling. SGG first groups gradient statistics in each layer into clusters and then applies cluster-specific scaling to calibrate learning rates for each parameter, thus imposing collective group-wise constraints while maintaining precise per-parameter adaptation. Experiments on diverse (M)LLM benchmarks show that SGG integrates seamlessly with existing optimizers, offering consistent gains and faster convergence over baselines across various model sizes. Its stability across varying batch sizes and learning rates establishes SGG as a robust choice for LLM optimization.</p>
-        </div>
-    </section>
+            <!-- MAIN TITLE (logo + "AlphaOne:") -->
+            <h1 class="title is-1 publication-title is-bold">
+              <span class="alphaone" style="vertical-align: middle">AlphaOne</span>
+            </h1>
 
-    <section id="overview">
-        <div class="container">
-            <h2>Overview & Key Takeaways</h2>
-            <p>Training large language models (LLMs) presents significant challenges due to their scale and architectural heterogeneity. Adaptive optimizers like AdamW help but still face issues with training instability and slow convergence, especially when combined with parameter-efficient fine-tuning (PEFT) techniques. This paper introduces Scaling with Gradient Grouping (SGG), an optimizer wrapper that enhances adaptive learning rate estimation by dynamically grouping gradient statistics and applying cluster-specific scaling. SGG improves training stability, convergence speed, and compatibility with PEFT, as demonstrated through experiments on various LLM and MLLM benchmarks.</p>
-            <h3>Key Takeaways</h3>
-            <ul>
-                <li>SGG enhances adaptive learning rate estimation through dynamic gradient grouping and cluster-specific scaling.</li>
-                <li>It offers consistent performance gains across diverse (M)LLM benchmarks and model sizes.</li>
-                <li>SGG is robust to varying batch sizes and learning rates, ensuring stable training.</li>
-                <li>It integrates seamlessly with existing optimizers and PEFT techniques, improving convergence speed.</li>
-            </ul>
-        </div>
-    </section>
+            <!-- SUBTITLE -->
+            <h2 class="title is-1 publication-title is-bold" style="margin-top:-0.5em; margin-right: 30px; margin-left: 30px;">
+              Reasoning Models Thinking Slow and Fast at Test Time
+            </h2>
 
-    <section id="methodology">
-        <div class="container">
-            <h2>Methodology</h2>
-            <p>SGG enhances adaptive learning rate estimation by dynamically grouping gradient statistics and applying cluster-specific scaling. It uses online clustering to group parameters based on their gradient statistics, reducing memory overhead while maintaining per-parameter adaptation. The learning rates are then scaled based on the median deviation of each cluster from the global average, ensuring balanced optimization across different parameter groups.</p>
-        </div>
-    </section>
-
-    <section id="results">
-        <div class="container">
-            <h2>Experimental Results</h2>
-            <h3>Table 1: Overview of Optimizers</h3>
-            <table>
-                <thead>
-                    <tr>
-                        <th>Category</th>
-                        <th>Method</th>
-                        <th>Adaptive LR</th>
-                        <th>Basic State</th>
-                        <th>Extra State</th>
-                        <th>Low-Rank Plugin</th>
-                        <th>Extra Branch</th>
-                        <th>C4 ↓</th>
-                        <th>GPU Memory</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    <tr>
-                        <td>Classical Opt.</td>
-                        <td>SGD</td>
-                        <td>✗</td>
-                        <td>Weight & Grad.</td>
-                        <td>✗</td>
-                        <td>✗</td>
-                        <td>✗</td>
-                        <td>−</td>
-                        <td>2mn</td>
-                    </tr>
-                    <tr>
-                        <td rowspan="2">Adaptive Opt.</td>
-                        <td>Adam</td>
-                        <td>✓</td>
-                        <td>Weight & Grad.</td>
-                        <td>Momentum & Variance</td>
-                        <td>✗</td>
-                        <td>✗</td>
-                        <td>23.36</td>
-                        <td>3mn</td>
-                    </tr>
-                    <tr>
-                        <td>Adafactor</td>
-                        <td>✓</td>
-                        <td>Weight & Grad.</td>
-                        <td>Factored Momentum</td>
-                        <td>✗</td>
-                        <td>✗</td>
-                        <td>−</td>
-                        <td>2mn+(m+n)</td>
-                    </tr>
-                    <tr>
-                        <td>PEFT Opt.</td>
-                        <td>CAME</td>
-                        <td>✓</td>
-                        <td>Weight & Grad.</td>
-                        <td>Low-rank Momentum</td>
-                        <td>✓</td>
-                        <td>✓</td>
-                        <td>-1.64</td>
-                        <td>2mn+2(m+n)</td>
-                    </tr>
-                    <tr>
-                        <td>Wrapper</td>
-                        <td>SGG</td>
-                        <td>✓</td>
-                        <td>−</td>
-                        <td>−</td>
-                        <td>✓</td>
-                        <td>−</td>
-                        <td>-1.99</td>
-                        <td>+0</td>
-                    </tr>
-                </tbody>
-            </table>
-            <p><em>Annotation: Table 1 compares adaptive learning rate costs, low-rank integration, and performance for C4 pre-training. SGG achieves a PPL reduction of -1.99 with no additional GPU memory cost.</em></p>
-
-            <h3>Table 2: Group Statistics for SGG Scaling</h3>
-            <table>
-                <thead>
-                    <tr>
-                        <th>Statistics</th>
-                        <th>130M</th>
-                        <th>350M</th>
-                        <th>1B</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    <tr>
-                        <td>Param</td>
-                        <td>25.08</td>
-                        <td>17.92</td>
-                        <td>15.56</td>
-                    </tr>
-                    <tr>
-                        <td>Mean</td>
-                        <td>22.76</td>
-                        <td>17.47</td>
-                        <td>14.76</td>
-                    </tr>
-                    <tr>
-                        <td>MAD</td>
-                        <td>22.58</td>
-                        <td>17.37</td>
-                        <td>14.54</td>
-                    </tr>
-                    <tr>
-                        <td>MDA</td>
-                        <td>22.18</td>
-                        <td>17.28</td>
-                        <td>14.30</td>
-                    </tr>
-                </tbody>
-            </table>
-            <p><em>Annotation: Table 2 shows validation PPL for LLaMA on C4 using different statistics. MDA yields the best results across all model sizes.</em></p>
-
-            <h3>Table 2: Gains vs. Costs</h3>
-            <table>
-                <tr>
-                    <th>Mode</th>
-                    <th>PPL</th>
-                    <th>Time (+h)</th>
-                    <th>GPU Memory</th>
-                </tr>
-                </thead>
-                <tbody>
-                <tr>
-                    <td>GPU</td>
-                    <td>6.5</td>
-                    <td>2</td>
-                    <td>4.3G</td>
-                </tr>
-                <tr>
-                    <td>CPU</td>
-                    <td>6.35</td>
-                    <td>9</td>
-                    <td>0.0G</td>
-                </tr>
-                <tr>
-                    <td>Hybrid</td>
-                    <td>6.35</td>
-                    <td>4</td>
-                    <td>2.1G</td>
-                </tr>
-                </tbody>
-            </table>
-            <p><em>Annotation: Table 3 evaluates relative PPL gains and costs for LLaMA-1B on C4. SGG achieves a 6.5% PPL gain with minimal overhead in Hybrid mode.</em></p>
-
-            <h3>Table 4: C4 Pre-training with LLaMA</h3>
-            <table>
-                <thead>
-                    <tr>
-                        <th>Optimizer</th>
-                        <th>60M</th>
-                        <th>130M</th>
-                        <th>350M</th>
-                        <th>1B</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    <tr>
-                        <td>AdamW</td>
-                        <td>34.68</td>
-                        <td>32.48</td>
-                        <td>25.00</td>
-                        <td>18.78</td>
-                    </tr>
-                    <tr>
-                        <td>Adam+SGG</td>
-                        <td>30.31</td>
-                        <td>22.18</td>
-                        <td>17.28</td>
-                        <td>14.30</td>
-                    </tr>
-                    <tr>
-                        <td>LoRA</td>
-                        <td>−4.37</td>
-                        <td>−10.30</td>
-                        <td>−7.72</td>
-                        <td>−4.48</td>
-                    </tr>
-                </tbody>
-            </table>
-            </table>
-            <p><em>Annotation: Table 4 compares PPLs for LLaMA models. Adam+SGG consistently outperforms, with LoRA+SGG showing significant gains.</em></p>
-
-            <h3>Table 5: GLUE Benchmark with RoBERTa</h3>
-            <table>
-                <thead>
-                    <tr>
-                        <th>Optimizer</th>
-                        <th>Full-Rank</th>
-                        <th>Rank 4</th>
-                        <th>Rank 8</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    <tr>
-                        <td>AdamW</td>
-                        <td>−</td>
-                        <td>−</td>
-                        <td>−</td>
-                    </tr>
-                    <tr>
-                        <td>AdamW+SGG</td>
-                        <td>+1.00</td>
-                        <td>+1.27</td>
-                        <td>+0.92</td>
-                    </tr>
-                </tbody>
-            </table>
-            <p><em>Annotation: Table 5 reports top-1 accuracy gains on GLUE with RoBERTa. SGG improves performance across all settings.</em></p>
-
-            <h3>Table 6: LLaMA-7B PEFT on Commonsense</h3>
-            <table>
-                <thead>
-                    <tr>
-                        <th>Optimizer</th>
-                        <th>BoolQ</th>
-                        <th>PIQA</th>
-                        <th>OBQA</th>
-                        <th>Avg</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    <tr>
-                        <td>LoRA</td>
-                        <td>−</td>
-                        <td>
-                        <td>−</td>
-                        <td>−</td>
-                    </tr>
-                    <tr>
-                        <td>LoRA+SGG</td>
-                        <td>+1.4</td>
-                        <td>+2.9</td>
-                        <td>+4.2</td>
-                        <td>+2.9</td>
-                    </tr>
-                </tbody>
-            </table>
-            <p><em>Annotation: Table 6 shows LoRA+SGG improving commonsense reasoning tasks with an average accuracy gain of +2.9%.</em></p>
-
-            <h3>Table 7: Qwen2.5-0.5B DPO Results</h3>
-            <table>
-                <thead>
-                    <tr>
-                        <th>Optimizer</th>
-                        <th>Full-rank</th>
-                        <th>LoRA</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    <tr>
-                        <td>AdamW t<td>
-                        <td>71.39</td>
-                        <td>70.22</td>
-                    </tr>
-                    <tr>
-                        <td>AdamW+SGG</td>
-                        <td>71.84</td>
-                        <td>72.02</td>
-                    </tr>
-                </tbody>
-            </table>
-            <p><em>Annotation: Table 7 compares DPO accuracy. SGG+SGG enhances LoRA performance with a +1.80% gain.</em></p>
-
-            <h3>Table 8: MLLM Performance</h3>
-            <table>
-                <thead>
-                    <tr>
-                        <th>Optimizer</th>
-                        <th>VizWiz</th>
-                        <th>Average</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    <tr>
-                        <td>AdamW</td>
-                        <td>−</td>
-                        <td>−</td>
-                    </tr>
-                    <tr>
-                        <td>AdamW+SGG</td>
-                        <td>+1.0</td>
-                        <td>+1.0</td>
-                    </tr>
-                    <tr>
-                        <td>Adafactor+SGG</td>
-                        <td>+2.4</td>
-                        <td>+0.6</td>
-                    </tr>
-                </tbody>
-            </table>
-            </table>
-            <p><em>Annotation: Table 8 shows SGG improving MLLM performance, with notable gains on VizWiz (+2.4%).</em></p>
-
-            <h3>Table 9: Ablation Studies</h3>
-            <table>
-                <thead>
-                    <tr>
-                        <th>Task</th>
-                        <th>K=1</th>
-                        <th>K=2</th>
-                        <th>K=3</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    <tr>
-                        <td>LLaMA-60M</td>
-                        <td>34.1</td>
-                        <td>30.3</td>
-                        <td>30.8</td>
-                    </tr>
-                    <tr>
-                        <td>LLaMA-130M</td>
-                        <td>25.1</td>
-                        <td>23.3</td>
-                        <td>23.5</td>
-                    </tr>
-                </tbody>
-            </table>
-            <p><em>Annotation: Table 9 ablates the number of SGG clusters, showing optimal results at K=2 for most tasks.</em></p>
-        </div>
-    </section>
-
-    <section id="links">
-        <div class="container">
-            <h2>Links</h2>
-            <div class="buttons">
-                <a href="https://arxiv.org/pdf/2506.01049" target="_blank" class="button">
-                    <img src="https://arxiv.org/icons/sfx.gif" alt="arXiv Logo">
-                    Paper
-                </a>
-                <a href="https://github.com/ScalingOpt/SGG" target="_blank" class="button">
-                    <img src="https://github.githubassets.com/images/modules/logos_page/Octocat.png" alt="GitHub Logo">
-                    Code
-                </a>
+            <!-- Author list -->
+            <div class="is-size-5 publication-authors">
+              <span class="author-block">
+                <a href="https://jyzhang1208.github.io/" target="_blank">Junyu Zhang</a>
+                <sup style="display: inline-flex; align-items: center; margin-left: -0.3em; gap: 0.05em;">
+                  <img src="website/img/uiuc.svg" alt="uiuc" style="height: 0.85em; vertical-align: baseline; margin: 0 0.1em;">&#8224;
+                </sup>&nbsp;&nbsp;&nbsp;
+              </span>
+              <span class="author-block">
+                <a href="https://runpeidong.web.illinois.edu/" target="_blank">Runpei Dong</a>
+                <sup style="display: inline-flex; align-items: center; margin-left: -0.3em; gap: 0.05em;">
+                  <img src="website/img/uiuc.svg" alt="uiuc" style="height: 0.85em; vertical-align: baseline; margin: 0 0.1em;">&#8224;
+                </sup>&nbsp;&nbsp;&nbsp;
+              </span>
+              <span class="author-block">
+                <a href="https://rookiehb.github.io/" target="_blank">Han Wang</a>
+                <sup style="display: inline-flex; align-items: center; margin-left: -0.3em; gap: 0.05em;">
+                  <img src="website/img/uiuc.svg" alt="uiuc" style="height: 0.85em; vertical-align: baseline; margin: 0 0.1em;">
+                </sup>&nbsp;&nbsp;&nbsp;
+              </span>
+              <span class="author-block">
+                <a href="https://scholar.google.com/citations?user=-tpUy14AAAAJ&hl=en" target="_blank">Xuying Ning</a>
+                <sup style="display: inline-flex; align-items: center; margin-left: -0.3em; gap: 0.05em;">
+                  <img src="website/img/uiuc.svg" alt="uiuc" style="height: 0.85em; vertical-align: baseline; margin: 0 0.1em;">
+                </sup>&nbsp;&nbsp;&nbsp;
+              </span><br>
+              <span class="author-block">
+                <a href="https://geng-haoran.github.io/">Haoran Geng</a>
+                <sup style="display: inline-flex; align-items: center; margin-left: -0.3em; gap: 0.05em;">
+                  <img src="website/img/berkeley_logo.svg" alt="ucb" style="height: 0.9em; vertical-align: baseline; margin: 0 0.1em;">
+                </sup>&nbsp;&nbsp;&nbsp;
+              </span>
+              <span class="author-block">
+                <a href="https://scholar.google.com/citations?user=GegXM9gAAAAJ&hl=en">Peihao Li</a>
+                <sup style="display: inline-flex; align-items: center; margin-left: -0.3em; gap: 0.05em;">
+                  <img src="website/img/berkeley_logo.svg" alt="ucb" style="height: 0.9em; vertical-align: baseline; margin: 0 0.1em;">
+                </sup>&nbsp;&nbsp;&nbsp;                
+              </span>
+              <span class="author-block">
+                <a href="https://xialin-he.github.io/">Xialin He</a>
+                <sup style="display: inline-flex; align-items: center; margin-left: -0.3em; gap: 0.05em;">
+                  <img src="website/img/uiuc.svg" alt="uiuc" style="height: 0.85em; vertical-align: baseline; margin: 0 0.1em;">
+                </sup>&nbsp;&nbsp;&nbsp;
+              </span>
+              <span class="author-block">
+                <a href="https://yutongbai.com/">Yutong Bai</a>
+                <sup style="display: inline-flex; align-items: center; margin-left: -0.3em; gap: 0.05em;">
+                  <img src="website/img/berkeley_logo.svg" alt="ucb" style="height: 0.9em; vertical-align: baseline; margin: 0 0.1em;">
+                </sup>&nbsp;&nbsp;&nbsp;
+              </span>
+              <span class="author-block">
+                <a href="https://people.eecs.berkeley.edu/~malik/">Jitendra Malik</a>
+                <sup style="display: inline-flex; align-items: center; margin-left: -0.3em; gap: 0.05em;">
+                  <img src="website/img/berkeley_logo.svg" alt="ucb" style="height: 0.9em; vertical-align: baseline; margin: 0 0.1em;">
+                </sup>&nbsp;&nbsp;&nbsp;              
+              </span><br>
+              <span class="author-block">
+                <a href="https://saurabhg.web.illinois.edu/">Saurabh Gupta</a>
+                <sup style="display: inline-flex; align-items: center; margin-left: -0.3em; gap: 0.05em;">
+                  <img src="website/img/uiuc.svg" alt="uiuc" style="height: 0.85em; vertical-align: baseline; margin: 0 0.1em;">
+                </sup>&nbsp;&nbsp;&nbsp;
+              </span>
+              <span class="author-block">
+                <a href="https://www.huan-zhang.com/">Huan Zhang</a>
+                <sup style="display: inline-flex; align-items: center; margin-left: -0.3em; gap: 0.05em;">
+                  <img src="website/img/uiuc.svg" alt="uiuc" style="height: 0.85em; vertical-align: baseline; margin: 0 0.1em;">
+                </sup>
+              </span>
             </div>
-            <h3>Citation</h3>
-            <pre>
-@article{Li2025,
-  author  = {Li, Siyuan and Tian, Juanxi and Wang, Zedong and Jin, Xin and Liu, Zicheng and Zhang, Wentao and Xu, Dan},
-  title   = {Taming LLMs by Scaling Learning Rates with Gradient Grouping with Grouping},
-  journal = {arXiv:},
-  year    = {2025}
-}
-            </pre>
-        </div>
-    </section>
+            <div class="is-size-5 publication-authors" style="margin-top:1em;">
+              <span class="author-block">
+                <sup style="display: inline-flex; align-items: center; margin-left: -0.3em; gap: 0.05em;">
+                  <img src="website/img/uiuc.svg" alt="uiuc" style="height: 0.85em; vertical-align: baseline; margin: 0 0.1em;">
+                </sup>University of Illinois Urbana-Champaign</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+              <span class="author-block">
+                <sup style="display: inline-flex; align-items: center; margin-left: -0.3em; gap: 0.05em;">
+                  <img src="website/img/berkeley_logo.svg" alt="ucb" style="height: 0.9em; vertical-align: baseline; margin: 0 0.1em;">
+                </sup>UC Berkeley</span>
+            </div>
+            <div class="is-size-5 publication-authors">
+              <span class="author-block"><sup>&#8224</sup>Equal contribution</span>
+            </div>
 
-    <footer>
-        <div class="container">
-            <p>&copy; 2025 SGG Project Team. All Rights Reserved.</p>
-    </footer>
+            <!-- Links -->
+            <div class="column has-text-centered" style="margin-top:1.5em;">
+              <span class="link-block">
+                <a href="http://arxiv.org/abs/2505.24863" class="external-link button is-normal is-rounded is-dark">
+                  <span class="icon">
+                    <i class="ai ai-arxiv"></i>
+                  </span>
+                  <span>Paper</span>
+                </a>&nbsp;&nbsp;
+              </span>
+              <span class="link-block">
+                <a href="https://github.com/ASTRAL-Group/AlphaOne" class="external-link button is-normal is-rounded is-dark" role="button" target="_blank">
+                  <span class="icon">
+                    <i class="fab fa-github"></i>
+                  </span>
+                  <span>Code (Coming soon)</span>
+                </a> &nbsp;&nbsp;
+              </span>
+            </div>
+
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+<section class="section">
+  <div class="container" style="margin-top: -6rem; margin-bottom: -4rem; max-width: 80%;">
+    <div class="columns is-centered m-6">
+      <div class="column is-full">
+        <!-- 修改1：使用table-cell布局保持等高 -->
+        <div class="box p-4" style="width: 80%; height: 90%; margin: 0 auto; display: flex; align-items: center;">
+          <div class="columns is-mobile is-vcentered" style="display: table-row; margin: 0rem auto;">
+            <!-- 图片列 -->
+            <div class="column is-half" style="display: table-cell; vertical-align: middle;">
+              <div style="text-align: right; padding-right: -1rem;">
+                <img src="website/img/teaser.png" alt="alphaone-teaser" 
+                     style="max-width: 90%; margin-right: -0.3rem;"/>
+              </div>
+            </div>
+            <!-- 文字列 -->
+            <div class="column is-half" style="display: table-cell; vertical-align: middle;">
+              <div style="text-align: left; padding-left: -1rem; padding-top: 1.7rem;">
+                <img src="website/img/teaser-caption.png" alt="alphaone-teaser" 
+                     style="max-width: 100%; margin-left: -0.5rem;"/>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+<!-- <p style="text-align: left; margin: 0; color:rgb(60, 56, 56);"> 
+                  <b>Figure 1.</b> <b>Conceptual illustration</b> of reasoning modulation strategies. 
+                  Our <span style="font-size: 0.9em;">\(\alpha\)1</span> employs a <i>slow-to-fast</i> reasoning schedule controlled by <span style="font-size: 0.9em;">\(\alpha\)</span>. 
+                  <span style="font-size: 0.9em;">\(\alpha\)1</span> scales more efficiently than <i>monotonously increasing</i> method s1 (<span style="color: #dbbf65; font-weight: bold; font-size: 1.0em;">yellow</span>) and generally outperforms <i>monotonously decreasing</i> (<span style="color: #a36ca0; font-weight: bold; font-size: 1.0em;">purple</span>) approaches.
+                </p> -->
+  <!-- Overview Section -->
+  <section class="section" id="overview" style="padding-top:1.5rem;">
+    <div class="container" style="max-width: 80%; margin: 0 auto;">
+      <h1 class="title is-3" style="text-align:center; font-size: 2.3em; margin-bottom:1rem;">Overview</h1>
+      <br>
+      <div class="content has-text-justified" style="max-width: 85%; font-size: 1.2em; margin: 0 auto; line-height: 1.55;">
+        <p style="text-align:justify; color:rgb(31, 30, 30);">
+          We present <span class="alphaone">AlphaOne</span> (<img src="website/img/alphaone.png" width="25" height="25" style="display: inline-block; vertical-align: -2px;">), a universal framework for <b>modulating reasoning progress</b> in large reasoning models (LRMs) at test time.
+          <img src="website/img/alphaone.png" width="25" height="25" style="display: inline-block; vertical-align: -2px;"> first introduces <b><img src="website/img/alpha.png" width="14" height="14" style="display: inline-block; vertical-align: -1px;"> moment</b>, which represents the scaled thinking phase with a universal parameter <img src="website/img/alpha.png" width="14" height="14" style="display: inline-block; vertical-align: -1px;">. Within this scaled pre-<img src="website/img/alpha.png" width="14" height="14" style="display: inline-block; vertical-align: -1px;"> moment phase, it dynamically schedules slow thinking transitions by modeling the insertion of reasoning transition tokens as a Bernoulli stochastic process. 
+          After the <img src="website/img/alpha.png" width="14" height="14" style="display: inline-block; vertical-align: -1px;"> moment, <img src="website/img/alphaone.png" width="25" height="25" style="display: inline-block; vertical-align: -2px;"> deterministically terminates slow thinking with the end-of-thinking token, thereby fostering fast reasoning and efficient answer generation.
+        </p>
+        <p style="text-align:justify; color:rgb(31, 30, 30);">
+          This approach unifies and generalizes existing monotonic scaling methods by enabling <b>flexible and dense slow-to-fast reasoning modulation</b>,
+          while offering critical insights into the joint optimization of reasoning capabilities and computational efficiency.
+        </p>
+      </div>
+
+      <!-- Figure 1 -->
+      <div class="columns is-centered has-text-centered">
+        <div class="column is-eight-fifths">
+          <figure class="table-figure">
+            <img class="figure-image" src="website/img/framework.png" alt="Figure 1. Overview of AlphaOne." style="max-width: 85%; text-align:center; margin-bottom:1rem; margin-top:1.5rem;"/>
+            <figcaption class="figure-caption" style="font-size: 1.1em;">
+              <b>Figure 2.</b> Overview of <span class="alphaone">AlphaOne</span> (<img src="website/img/alphaone.png" width="23" height="23" style="display: inline-block; vertical-align: -2px;">). Here <img src="website/img/point.svg" width="23" height="23" style="display: inline-block; vertical-align: -4px;"> represents <img src="website/img/alpha.png" width="13" height="13" style="display: inline-block; vertical-align: -1px;"> moment.
+            </figcaption>
+          </figure>
+
+          <p style="text-align:justify; color:rgb(31, 30, 30); font-size: 1.2em; margin-top:1rem; margin-bottom:1rem; line-height: 1.55; max-width: 85%; margin: 0 auto;">
+            <img src="website/img/alphaone.png" width="25" height="25" style="display: inline-block; vertical-align: -2px;"> applies dense reasoning modulation via a user-defined slow thinking scheduling in pre-<img src="website/img/alpha.png" width="14" height="14" style="display: inline-block; vertical-align: -1px;"> moment. 
+            In addition, <img src="website/img/alphaone.png" width="25" height="25" style="display: inline-block; vertical-align: -2px;"> utilizes a post-<img src="website/img/alpha.png" width="14" height="14" style="display: inline-block; vertical-align: -1px;"> moment modulation by replacing slow thinking transitioning tokens "<code style="background: none; padding: 0; color: rgb(31, 30, 30);">wait</code>" to "<code style="background: none; padding: 0; color: rgb(31, 30, 30);">&lt;/think&gt;</code>", which fosters fast thinking. 
+            Specifically, <img src="website/img/alpha.png" width="14" height="14" style="display: inline-block; vertical-align: -1px;"> determines when the slow-to-fast reasoning transition occurs. For example, reducing <img src="website/img/alpha.png" width="14" height="14" style="display: inline-block; vertical-align: -1px;"> from 1.4 to 1.0 shifts the <img src="website/img/alpha.png" width="14" height="14" style="display: inline-block; vertical-align: -1px;"> moment earlier, resulting in shorter slow reasoning phase and accelerating the annealing of <img src="website/img/pwait.png" width="45" height="45" style="display: inline-block; vertical-align: -2px;">.
+          </p>
+
+        </div>
+      </div>
+  </section> 
+
+  <section class="section" id="overview" style="padding-top:1.5rem;">
+    <div class="container" style="max-width: 80%; margin: 0 auto;">
+      <h1 class="title is-3" style="text-align:center; font-size: 2.3em; margin-bottom:1rem;">Key Takeaways</h1>
+      <br>
+      <div class="content has-text-justified" style="max-width: 85%; font-size: 1.2em; margin: 0 auto; line-height: 1.55;">
+        <p style="text-align:justify; color:rgb(31, 30, 30);">
+          We present some insightful findings from evaluating three different <img src="website/img/alphaone.png" width="25" height="25" style="display: inline-block; vertical-align: -2px;"> LRMs, ranging from 1.5B to 32B across six reasoning benchmarks, including math, code generation, and scientific problem reasoning.
+        </p>
+        <p style="text-align:justify; color:rgb(31, 30, 30); margin-bottom: -0.1em;">
+          <span style="font-size:1.3em;">💡</span> <b>Slow thinking first</b>, then fast thinking, leads to better LRM reasoning.
+        </p>
+        <p style="text-align:justify; color:rgb(31, 30, 30); margin-bottom: -0.1em;">
+          <span style="font-size:1.3em;">💡</span> Slow thinking can bring <b>efficient</b> test-time scaling.
+        </p>
+        <p style="text-align:justify; color:rgb(31, 30, 30);">
+          <span style="font-size:1.3em;">💡</span> Slow thinking transitioning in <b>high frequency</b> is helpful.
+        </p>
+      </div>
+      <div class="columns is-centered has-text-centered">
+        <div class="column is-eight-fifths">
+          <figure class="table-figure">
+            <img class="figure-image" src="website/img/scheduling-plot.png" alt="Figure 2. Visualization of different scheduling." style="max-width: 85%; text-align:center; margin-bottom:1rem; margin-top:1.5rem;"/>
+            <figcaption class="figure-caption" style="font-size: 1.1em;">
+              <b>Figure 3.</b> Visualization of different scheduling strategies. Here <img src="website/img/point.svg" width="23" height="23" style="display: inline-block; vertical-align: -4px;"> represents <img src="website/img/alpha.png" width="13" height="13" style="display: inline-block; vertical-align: -1px;"> moment.
+            </figcaption>
+          </figure>
+        </div>
+      </div>
+  </section> 
+
+  <section class="section" id="leaderboard-findings" style="padding-top:1.5rem;">
+    <div class="container" style="max-width: 85%">
+      <h1 class="title is-3" style="text-align:center; font-size: 2.3em; margin-bottom:3rem;">Experiments</h1>
+        <ul class="nav nav-tabs" id="myTab1" role="tablist">
+          <li class="nav-item" role="presentation">
+              <button class="nav-link active" id="deepseek-1b-tab" data-bs-toggle="tab"
+                  data-bs-target="#deepseek-1b-content" type="button" role="tab"
+                  aria-controls="deepseek-1b-content" aria-selected="true" style="font-size: 1.1em;">DeepSeek-R1-Distill-Qwen-1.5B</button>
+          </li>
+          <li class="nav-item" role="presentation">
+              <button class="nav-link" id="deepseek-7b-tab" data-bs-toggle="tab"
+                  data-bs-target="#deepseek-7b-content" type="button" role="tab"
+                  aria-controls="deepseek-7b-content" aria-selected="false" style="font-size: 1.1em;">DeepSeek-R1-Distill-Qwen-7B</button>
+          </li>
+          <li class="nav-item" role="presentation">
+              <button class="nav-link" id="qwq-32b-tab" data-bs-toggle="tab"
+                  data-bs-target="#qwq-32b-content" type="button" role="tab"
+                  aria-controls="qwq-32b-content" aria-selected="false" style="font-size: 1.1em;">QwQ-32B</button>
+          </li>
+        </ul>
+        <div class="tab-content" id="myTabContent">
+          <div class="tab-pane fade show active" id="deepseek-1b-content" role="tabpanel"
+              aria-labelledby="deepseek-1b-tab">
+              <div id="deepseek-1-5b-main-table"></div> 
+          </div>
+          <div class="tab-pane fade" id="deepseek-7b-content" role="tabpanel"
+              aria-labelledby="deepseek-7b-tab">
+              <div id="deepseek-7b-main-table"></div>
+          </div>
+            <div class="tab-pane fade" id="qwq-32b-content" role="tabpanel"
+              aria-labelledby="qwq-32b-tab">
+              <div id="qwq-32b-main-table"></div>
+          </div>
+        </div> 
+  </section>
+  <br>
+
+  <!-- Case Study -->
+  <section class="section" id="case-study" style="padding-top:1.5rem;">
+    <div class="container" style="max-width: 90%; min-width: 80%">
+      <h1 class="title is-3" style="text-align:center; font-size: 2.3em; margin-bottom:1rem;">Case Study</h1>
+      <br>
+      <!-- Success Carousel -->
+        <h3 class="title is-4" style="text-align:center; font-size: 1.7em; margin-bottom:-0.1rem;">Success Examples</h3>
+        <div id="results-carousel" class="carousel results-carousel" style="margin: 0 auto 2rem; display: flex; flex-direction: column; align-items: center; max-width: 90%; min-width: 80%; overflow: hidden; position: relative;">
+            <div class="box mx-auto my-4" style="max-width: 90%;">
+              <div class="content has-text-centered" style="margin-bottom: 0rem;">
+                <img src="website/img/success-1-5b-olympiad.png" alt="" width="75%"/>
+              </div>
+            </div>
+            <div class="box mx-auto my-4" style="max-width: 90%;">
+              <div class="content has-text-centered" style="margin-bottom: 0rem;">
+                <img src="website/img/success-7b-minerva.png" alt="" width="75%"/>
+              </div>
+            </div>
+            <div class="box mx-auto my-4" style="max-width: 90%;">
+              <div class="content has-text-centered" style="margin-bottom: 0rem;">
+                <img src="website/img/success-32b-math500.png" alt="" width="75%" />
+              </div>
+            </div>
+        </div>
+        <!-- Failure Carousel -->
+        <br>
+        <br>
+        <h3 class="title is-4" style="text-align:center; font-size: 1.7em; margin-top: 0.5rem; margin-bottom:-0.1rem;">Failure Examples</h3>
+        <div id="results-carousel" class="carousel results-carousel" style="margin: 0 auto 2rem; display: flex; flex-direction: column; align-items: center; max-width: 90%; min-width: 80%; overflow: hidden; position: relative;">
+            <div class="box mx-auto my-4" style="max-width: 90%;">
+              <div class="content has-text-centered" style="margin-bottom: 0rem;">
+                <img src="website/img/failure-7b-livecodebench.png" alt="" width="75%"/>
+              </div>
+            </div>
+            <div class="box mx-auto my-4" style="max-width: 90%;">
+              <div class="content has-text-centered" style="margin-bottom: 0rem;">
+                <img src="website/img/failure-32b-aime24.png" alt="" width="75%" />
+              </div>
+            </div>
+            <div class="box mx-auto my-4" style="max-width: 90%;">
+              <div class="content has-text-centered" style="margin-bottom: 0rem;">
+                <img src="website/img/failure-1-5b-amc23.png" alt="" width="75%"/>
+              </div>
+            </div>
+        </div>
+      </section>
+    
+
+
+  <!-- BibTeX Section -->
+  <section class="section" id="BibTeX" style="padding-top:1.5rem;">
+    <div class="container is-max-desktop content" style="max-width: 80%; margin: 0 auto -0.1rem auto;">
+      <h1 class="title is-3" style="text-align:center; font-size: 2.3em;">BibTeX</h1>
+      <pre style="font-size: 1.0em;">
+        @article{AlphaOne25,
+          title={AlphaOne: Reasoning Models Thinking Slow and Fast at Test Time},
+          author={Zhang, Junyu and Dong, Runpei and Wang, Han and Ning, Xuying and Geng, Haoran and Li, Peihao and He, Xialin and Bai, Yutong and Malik, Jitendra and Gupta, Saurabh and Zhang, Huan},
+          journal={arXiv preprint arXiv:2505.24863},
+          year={2025}
+        }
+      </pre>
+    </div>
+  </section>
+
+  <section>
+    <div class="section" id="org-banners"
+         style="max-width: 80%; margin: -0.5rem auto 0.2rem auto; display: flex; justify-content: center; gap: 2rem;">
+         
+      <a href="https://illinois.edu/" target="_blank" rel="external">
+        <img class="center-block org-banner" src="website/img/uiuc.webp"
+             style="width: 350px; height: auto;">
+      </a>
+  
+      <a href="https://www.berkeley.edu/" target="_blank" class="ext-link">
+        <img class="center-block org-banner" src="website/img/berkeley_logo.svg"
+             style="width: 150px; height: auto;">
+      </a>
+  
+      <a href="https://bair.berkeley.edu/" target="_blank" class="ext-link">
+        <img class="center-block org-banner" src="website/img/BAIR_Logo_Blue_BearOnly.svg"
+             style="width: 150px; height: auto;">
+      </a>
+    </div>
+  </section>
+  
+
+  <footer class="footer">
+    <!-- <div class="content has-text-centered"> -->
+    <div class="columns is-centered">
+        <div class="column is-9">
+          <div class="content">
+          <p style="font-size: 1.15em;">
+            This website is adapted from 
+            <a href="https://nerfies.github.io/" style="text-decoration: none;">Nerfies</a>, licensed under a 
+            <a rel="license" href="http://creativecommons.org/licenses/by-sa/4.0/" style="text-decoration: none;">
+              Creative Commons Attribution-ShareAlike 4.0 International License
+            </a>.
+          </p>
+        </div>
+      </div>
+    </div>
+  <!-- </div> -->
+</footer>
+
+
 </body>
 </html>
