@@ -1,5 +1,5 @@
 <div align="center">
-<h1>【ACL'25 Main】 Taming LLMs by Scaling Learning Rates <br> with Gradient Grouping</h1>
+<h1>[ACL'25 Main] Taming LLMs by Scaling Learning Rates <br> with Gradient Grouping</h1>
 
 <a href="https://arxiv.org/pdf/2506.01049" target="_blank" rel="noopener noreferrer">
   <img src="https://img.shields.io/badge/Paper-SGG" alt="Paper PDF">
