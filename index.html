@@ -875,50 +875,7 @@
                 </tr>
             </tbody>
         </table>
-        <h3 class="subtitle is-5" style="text-align:center; font-size: 1em;">DPO</h3>
-        <table class="table is-fullwidth">
-            <caption style="caption-side: top; font-weight: bold; text-align: center;">Table 7: Qwen2.5-0.5B DPO Results with full-rank and LoRA setups. Top-1 accuracy(%)↑ is reported. Bold and green types denote best results and relative gains.</caption>
-            <thead>
-                <tr>
-                    <th>Optimizer</th>
-                    <th>Full-Rank</th>
-                    <th>LoRA</th>
-                </tr>
-            </thead>
-            <tbody>
-                <tr>
-                    <td>SGD</td>
-                    <td>70.10</td>
-                    <td>69.73</td>
-                </tr>
-                <tr>
-                    <td>AdamW</td>
-                    <td>71.39</td>
-                    <td>70.22</td>
-                </tr>
-                <tr>
-                    <td>LAMB</td>
-                    <td>70.82</td>
-                    <td>70.39</td>
-                </tr>
-                <tr>
-                    <td>SGD+SGG</td>
-                    <td><span style="background-color: #E6F7FF; color: #007BFF;">70.82</span></td>
-                    <td><span style="background-color: #E6F7FF; color: #007BFF;">70.76</span></td>
-                </tr>
-                <tr>
-                    <td>AdamW+SGG</td>
-                    <td><span style="background-color: #E6F7FF; color: #007BFF;">71.85</span></td>
-                    <td><span style="background-color: #E6F7FF; color: #007BFF;">72.02</span></td>
-                </tr>
-                <tr>
-                    <td>LAMB+SGG</td>
-                    <td><span style="background-color: #E6F7FF; color: #007BFF;">71.32</span></td>
-                    <td><span style="background-color: #E6F7FF; color: #007BFF;">71.28</span></td>
-                </tr>
-            </tbody>
-        </table>
-        <h2 class="subtitle is-4" style="text-align:center; font-size: 1.1em;">3.3 Comparison Results with MLLMs</h2>
+        <h2 class="subtitle is-4" style="text-align:center; font-size: 1.1em;">Comparison Results with MLLMs</h2>
         <h3 class="subtitle is-5" style="text-align:center; font-size: 1em;">Full-Rank SFT</h3>
         <table class="table is-fullwidth">
             <caption style="caption-side: top; font-weight: bold; text-align: center;">Table 8: MLLM performance comparison on diverse benchmarks with LLaVA variants and different optimizers. Top-1 accuracy (%)↑ for selected tasks and all-task averaged (Avg.) results are reported. MMB and MMBCN denote MMbench and MMbench (Chinese). Bold and green types denote the best results and gains↓ of SGG (blue background) over related baselines (gray background). Please view Table A6 for the full results.</caption>
@@ -1281,16 +1238,6 @@
                 </tr>
             </tbody>
 </table>
-<h3 class="subtitle is-5" style="text-align:center; font-size: 1em;">Recluster Interval</h3>
-<figure class="image">
-<img src="https://via.placeholder.com/600x400" alt="Recluster Interval T">
-<figcaption style="font-weight: bold; text-align: center;">Figure 6(a): Ablation of Recluster Interval T. Validation Perplexity (PPL %↓: lower is better) vs. Recluster Interval T (% total iterations) for LLaMA-60M and LLaMA-130M pre-training on C4. The results demonstrate that T ≈ 500 (10% of total iterations) is a favorable setting for SGG.</figcaption>
-</figure>
-<h3 class="subtitle is-5" style="text-align:center; font-size: 1em;">Scaling Decay</h3>
-<figure class="image">
-<img src="https://via.placeholder.com/600x400" alt="Scaling Decay β3">
-<figcaption style="font-weight: bold; text-align: center;">Figure 6(b): Ablation of Scaling Decay β3. Validation Perplexity (PPL %↓: lower is better) vs. Scaling Decay β3 for LLaMA-60M and LLaMA-130M pre-training on C4. The results show that β3 = 0.99 is a robust choice for SGG.</figcaption>
-</figure>
 </div>
 </section>
   
