@@ -281,6 +281,316 @@
         </div>
     </div>
 </section>
+
+<section class="section" id="Experiments" style="padding-top:1.5rem;">
+    <div class="container" style="max-width: 80%; margin: 0 auto;">
+        <h1 class="title is-3" style="text-align:center; font-size: 2.3em; margin-bottom:1rem;">Experiments</h1>
+        <br>
+        <div class="content has-text-justified" style="max-width: 85%; font-size: 1.2em; margin: 0 auto; line-height: 1.55;">
+            <p style="text-align:justify; color:rgb(31, 30, 30);">
+                To thoroughly evaluate the effectiveness of Scaling with Gradient Grouping (SGG), we conducted a comprehensive set of experiments across various benchmarks and tasks. The results demonstrate that SGG consistently improves performance and accelerates convergence when integrated with different optimizers and models.
+            </p>
+        </div>
+        <br>
+        <div class="content has-text-justified" style="max-width: 85%; font-size: 1.2em; margin: 0 auto; line-height: 1.55;">
+            <h2 style="text-align:left; font-size: 1.5em; margin-bottom:0.5rem;">3.2 Comparison Results with LLMs</h2>
+            <p style="text-align:justify; color:rgb(31, 30, 30);">
+                SGG was evaluated on various LLM benchmarks, including pre-training on C4, supervised fine-tuning (SFT) on GLUE, PEFT on commonsense reasoning tasks, and Direct Preference Optimization (DPO). The results show that SGG consistently delivers performance gains and faster convergence across different model sizes and settings.
+            </p>
+            <br>
+            <h3 style="text-align:left; font-size: 1.4em; margin-bottom:0.5rem;">Pre-training on C4</h3>
+            <p style="text-align:justify; color:rgb(31, 30, 30);">
+                Table 4 shows the validation perplexity (PPL) for different optimizers and model sizes during pre-training on the C4 dataset. SGG consistently reduces validation perplexity compared to baselines, with significant gains across various model sizes.
+            </p>
+            <table class="table is-bordered is-striped" style="width: 100%; margin-bottom: 1rem;">
+                <thead>
+                    <tr>
+                        <th>Method</th>
+                        <th>Venue</th>
+                        <th>60M</th>
+                        <th>130M</th>
+                        <th>350M</th>
+                        <th>1B</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>Adam</td>
+                        <td>ICLR'15</td>
+                        <td>34.06</td>
+                        <td>25.08</td>
+                        <td>18.80</td>
+                        <td>15.56</td>
+                    </tr>
+                    <tr>
+                        <td>NAdam</td>
+                        <td>ICLR'18</td>
+                        <td>35.86</td>
+                        <td>28.88</td>
+                        <td>19.24</td>
+                        <td>15.78</td>
+                    </tr>
+                    <tr>
+                        <td>RAdam</td>
+                        <td>ICLR'20</td>
+                        <td>30.43</td>
+                        <td>25.17</td>
+                        <td>19.13</td>
+                        <td>15.65</td>
+                    </tr>
+                    <tr>
+                        <td>LAMB</td>
+                        <td>ICLR'20</td>
+                        <td>33.04</td>
+                        <td>24.37</td>
+                        <td>18.26</td>
+                        <td>15.84</td>
+                    </tr>
+                    <tr>
+                        <td>Adan</td>
+                        <td>TPAMI'23</td>
+                        <td>32.01</td>
+                        <td>23.14</td>
+                        <td>17.32</td>
+                        <td>14.70</td>
+                    </tr>
+                    <tr>
+                        <td>Adam+SGG</td>
+                        <td>Ours</td>
+                        <td><strong>30.31</strong> (-3.75)</td>
+                        <td><strong>22.18</strong> (-2.90)</td>
+                        <td><strong>17.28</strong> (-1.52)</td>
+                        <td><strong>14.30</strong> (-1.26)</td>
+                    </tr>
+                </tbody>
+            </table>
+            <p style="text-align:justify; color:rgb(31, 30, 30);">
+                <strong>Table 4:</strong> C4 Pre-training with diverse LLaMA sizes (from 60M to 1B). Comparison of full-rank, memory-efficient, and low-rank optimizers. Validation Perplexity (PPL%↓: lower is better) is reported. Bold and green types denote the best results and gains↓ of SGG (blue background) over related baselines (gray background).
+            </p>
+            <br>
+            <h3 style="text-align:left; font-size: 1.4em; margin-bottom:0.5rem;">SFT on GLUE</h3>
+            <p style="text-align:justify; color:rgb(31, 30, 30);">
+                Table 5 shows the results of fine-tuning RoBERTa-base models on the GLUE benchmark. SGG consistently improves performance across various tasks and settings, demonstrating its versatility and robustness.
+            </p>
+            <table class="table is-bordered is-striped" style="width: 100%; margin-bottom: 1rem;">
+                <thead>
+                    <tr>
+                        <th>Optimizer</th>
+                        <th>Rank</th>
+                        <th>CoLA</th>
+                        <th>STS-B</th>
+                        <th>MRPC</th>
+                        <th>RTE</th>
+                        <th>SST2</th>
+                        <th>MNLI</th>
+                        <th>QNLI</th>
+                        <th>QQP</th>
+                        <th>Average</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>AdamW</td>
+                        <td>Full</td>
+                        <td>62.24</td>
+                        <td>90.92</td>
+                        <td>91.30</td>
+                        <td>79.42</td>
+                        <td>94.57</td>
+                        <td>87.18</td>
+                        <td>92.33</td>
+                        <td>92.28</td>
+                        <td>86.24</td>
+                    </tr>
+                    <tr>
+                        <td>AdamW+SGG</td>
+                        <td>Full</td>
+                        <td><strong>63.36</strong> (+1.12)</td>
+                        <td><strong>91.22</strong> (+0.30)</td>
+                        <td><strong>92.65</strong> (+1.35)</td>
+                        <td><strong>80.87</strong> (+1.45)</td>
+                        <td><strong>95.58</strong> (+1.01)</td>
+                        <td><strong>88.32</strong> (+1.14)</td>
+                        <td><strong>92.88</strong> (+0.55)</td>
+                        <td><strong>93.32</strong> (+1.04)</td>
+                        <td><strong>87.28</strong> (+1.00)</td>
+                    </tr>
+                </tbody>
+            </table>
+            <p style="text-align:justify; color:rgb(31, 30, 30);">
+                <strong>Table 5:</strong> GLUE Benchmark Results with RoBERTa-base. Top-1 accuracy (%↑: higher is better) is reported. Comparison across both full-rank and low-rank (LoRA r = 4, r = 8) settings. Bold and green types denote the best results and performance gains↑ of SGG (blue background) compared to related baselines (gray background).
+            </p>
+            <br>
+            <h3 style="text-align:left; font-size: 1.4em; margin-bottom:0.5rem;">PEFT on Commonsense Reasoning</h3>
+            <p style="text-align:justify; color:rgb(31, 30, 30);">
+                Table 6 shows the results of evaluating SGG on commonsense reasoning tasks using the LLaMA-7B model. SGG consistently improves performance across all tasks, achieving significant gains over baselines.
+            </p>
+            <table class="table is-bordered is-striped" style="width: 100%; margin-bottom: 1rem;">
+                <thead>
+                    <tr>
+                        <th>Method</th>
+                        <th>BoolQ</th>
+                        <th>PIQA</th>
+                        <th>SIQA</th>
+                        <th>WG</th>
+                        <th>Arc-E</th>
+                        <th>OBQA</th>
+                        <th>Average</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>LoRA</td>
+                        <td>68.9</td>
+                        <td>80.7</td>
+                        <td>77.4</td>
+                        <td>78.8</td>
+                        <td>77.8</td>
+                        <td>74.8</td>
+                        <td>74.7</td>
+                    </tr>
+                    <tr>
+                        <td>LoRA+SGG</td>
+                        <td><strong>70.3</strong> (+1.4)</td>
+                        <td><strong>83.6</strong> (+2.9)</td>
+                        <td><strong>78.8</strong> (+1.4)</td>
+                        <td><strong>81.7</strong> (+2.9)</td>
+                        <td><strong>81.5</strong> (+3.7)</td>
+                        <td><strong>79.0</strong> (+4.2)</td>
+                        <td><strong>77.6</strong> (+2.9)</td>
+                    </tr>
+                </tbody>
+            </table>
+            <p style="text-align:justify; color:rgb(31, 30, 30);">
+                <strong>Table 6:</strong> LLaMA-7B PEFT Results on Commonsense Reasoning. Comparison of LoRA+SGG (blue background) against baselines. Top-1 accuracy (%↑: higher is better) of selected tasks and all tasks on average (Avg.) are reported. Bold and green types denote the best results and gains↑ compared to LoRA (gray background).
+            </p>
+            <br>
+            <h3 style="text-align:left; font-size: 1.4em; margin-bottom:0.5rem;">DPO</h3>
+            <p style="text-align:justify; color:rgb(31, 30, 30);">
+                Table 7 shows the results of Direct Preference Optimization (DPO) using the Qwen2.5-0.5B model. SGG consistently improves performance across different optimizers and settings.
+            </p>
+            <table class="table is-bordered is-striped" style="width: 100%; margin-bottom: 1rem;">
+                <thead>
+                    <tr>
+                        <th>Optimizer</th>
+                        <th>Full-Rank</th>
+                        <th>LoRA</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>SGD</td>
+                        <td>70.10</td>
+                        <td>69.73</td>
+                    </tr>
+                    <tr>
+                        <td>AdamW</td>
+                        <td>71.39</td>
+                        <td>70.22</td>
+                    </tr>
+                    <tr>
+                        <td>LAMB</td>
+                        <td>70.82</td>
+                        <td>70.39</td>
+                    </tr>
+                    <tr>
+                        <td>SGD+SGG</td>
+                        <td><strong>70.82</strong> (+0.72)</td>
+                        <td><strong>70.76</strong> (+1.03)</td>
+                    </tr>
+                    <tr>
+                        <td>AdamW+SGG</td>
+                        <td><strong>71.85</strong> (+0.47)</td>
+                        <td><strong>72.02</strong> (+1.80)</td>
+                    </tr>
+                    <tr>
+                        <td>LAMB+SGG</td>
+                        <td><strong>71.32</strong> (+0.50)</td>
+                        <td><strong>71.28</strong> (+0.89)</td>
+                    </tr>
+                </tbody>
+            </table>
+            <p style="text-align:justify; color:rgb(31, 30, 30);">
+                <strong>Table 7:</strong> Qwen2.5-0.5B DPO Results with full-rank and LoRA setups. Top-1 accuracy(%)↑ is reported. Bold and green types denote best results and relative gains.
+            </p>
+            <br>
+            <h2 style="text-align:left; font-size: 1.5em; margin-bottom:0.5rem;">3.3 Comparison Results with MLLMs</h2>
+            <p style="text-align:justify; color:rgb(31, 30, 30);">
+                SGG was also evaluated on various multimodal LLM benchmarks, including VQA and MLLM evaluation benchmarks. The results demonstrate that SGG consistently improves performance across different tasks and settings.
+            </p>
+            <br>
+            <h3 style="text-align:left; font-size: 1.4em; margin-bottom:0.5rem;">Full-Rank SFT</h3>
+            <p style="text-align:justify; color:rgb(31, 30, 30);">
+                Table 8 shows the results of supervised fine-tuning (SFT) on various MLLM benchmarks using full-rank optimizers. SGG consistently improves performance across different tasks and optimizers.
+            </p>
+            <table class="table is-bordered is-striped" style="width: 100%; margin-bottom: 1rem;">
+                <thead>
+                    <tr>
+                        <th>Method</th>
+                        <th>Image Question Answering Benchmarks</th>
+                        <th>Avg.</th>
+                        <th>GQA</th>
+                        <th>VizWiz</th>
+                        <th>SciVQAI</th>
+                        <th>VQAT</th>
+                        <th>MMB</th>
+                        <th>MMBCN</th>
+                        <th>POPE</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>LLaVA-v1.5 AdamW</td>
+                        <td>62.0</td>
+                        <td>50.0</td>
+                        <td>66.8</td>
+                        <td>58.2</td>
+                        <td>64.3</td>
+                        <td>58.3</td>
+                        <td>85.9</td>
+                        <td>63.6</td>
+                    </tr>
+                    <tr>
+                        <td>LLaVA-v1.5 Adafactor</td>
+                        <td>62.7</td>
+                        <td>48.2</td>
+                        <td>70.7</td>
+                        <td>57.1</td>
+                        <td>66.1</td>
+                        <td>60.4</td>
+                        <td>86.0</td>
+                        <td>64.5</td>
+                    </tr>
+                    <tr>
+                        <td>LLaVA-v1.5 LAMB</td>
+                        <td>43.8</td>
+                        <td>53.3</td>
+                        <td>61.5</td>
+                        <td>43.4</td>
+                        <td>43.2</td>
+                        <td>41.8</td>
+                        <td>81.2</td>
+                        <td>52.6</td>
+                    </tr>
+                    <tr>
+                        <td>LLaVA-v1.5 AdamW+SGG</td>
+                        <td><strong>62.4</strong> (+0.4)</td>
+                        <td><strong>50.2</strong> (+0.2)</td>
+                        <td><strong>69.8</strong> (+3.0)</td>
+                        <td><strong>57.4</strong> (-0.8)</td>
+                        <td><strong>65.9</strong> (+1.6)</td>
+                        <td><strong>60.1</strong> (+1.8)</td>
+                        <td><strong>86.3</strong> (+0.4)</td>
+                        <td><strong>64.6</strong> (+1.0)</td>
+                    </tr>
+                </tbody>
+            </table>
+            <p style="text-align:justify; color:rgb(31, 30, 30);">
+                <strong>Table 8:</strong> MLLM performance comparison on diverse benchmarks with LLaVA variants and different optimizers. Top-1 accuracy (%)↑ for selected tasks and all-task averaged (Avg.) results are reported. MMB and MMBCN denote MMbench and MMbench (Chinese). Bold and green types denote the best results and gains↓ of SGG (blue background) over related baselines (gray background). Please view Table A6 for the full results.
+            </p>
+        </div>
+    </div>
+</section>
   
 </section>
   <!-- BibTeX Section -->
