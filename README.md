@@ -5,6 +5,7 @@
   <img src="https://img.shields.io/badge/Paper-SGG" alt="Paper PDF">
 </a>
 <a href="https://arxiv.org/abs/2506.01049"><img src="https://img.shields.io/badge/arXiv-2506.01049-b31b1b" alt="arXiv"></a>
+<a href="https://scalingopt.github.io/SGG/"><img src="https://img.shields.io/badge/Project_Page-green" alt="Project Page"></a>
 <a href='https://huggingface.co/papers/2506.01049'><img src='https://img.shields.io/badge/%F0%9F%A4%97%20Hugging%20Face-DailyPapers Top4-blue'></a>
 
 [Siyuan Li*](https://lupin1998.github.io), [Juanxi Tian*](https://github.com/tianshijing), [Zedong Wang*](https://jacky1128.github.io), [Xin Jin](https://jinxins.github.io), [Zicheng Liu](https://scholar.google.com/citations?hl=en&user=EwMGZsgAAAAJ), [Wentao&nbsp;Zhang](https://zwt233.github.io), [Dan Xu](https://www.danxurgb.net)
@@ -14,8 +15,8 @@
 </div>
 
 <p align="center">
-  <img src="SGG_1.png" width="450"/>
-  <img src="SGG_2.png" width="250"/>
+  <img src="figures/SGG_1.png" width="450"/>
+  <img src="figures/SGG_2.png" width="250"/>
 </p>
 
 **Abstract**
