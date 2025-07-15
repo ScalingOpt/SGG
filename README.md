@@ -14,13 +14,28 @@
 
 </div>
 
+<br>
+
 <p align="center">
-  <img src="figures/SGG_1.png" width="450"/>
-  <img src="figures/SGG_2.png" width="250"/>
+  <img src="figures/SGG_1.png" width="75%"/>
+  <br>
+  <em>
+    Illustration of SGG with online grouping and group-specific learning rate (LR) scaling upon adaptive LR optimizers.
+  </em>
 </p>
+
+<br>
 
 **Abstract**
 Training large language models (LLMs) poses challenges due to their massive scale and heterogeneous architectures. While adaptive optimizers like AdamW help address gradient variations, they still struggle with efficient and effective parameter-wise learning rate estimation, resulting in training instability, slow convergence, and poor compatibility with parameter-efficient fine-tuning (PEFT) techniques. This work introduces **Scaling with Gradient Grouping (SGG)**, an optimizer wrapper that improves adaptive learning rate estimation by dynamic grouping and group-specific scaling. SGG first groups gradient statistics in each layer into clusters and then applies cluster-specific scaling to calibrate learning rates for each parameter, thus imposing collective group-wise constraints while maintaining precise per-parameter adaptation. Experiments on diverse (M)LLM benchmarks show that SGG integrates seamlessly with existing optimizers, and offers consistent gains and faster convergence over baselines, with various model sizes. Its stability across varying batch sizes and learning rates establishes SGG as a robust choice for LLM optimization.
+
+### Method Overview
+
+**Scaling with Gradient Grouping (SGG)** enhances adaptive optimizers by introducing a drop-in two-step process within each optimization step:
+
+1.  **Online Gradient Grouping:** For each layer, SGG dynamically groups parameters based on the magnitude of their gradient statistics (e.g., second-moment estimates). This ensures that parameters with similarly-sized gradients are updated collectively.
+
+2.  **Group-wise LR Scaling:** SGG then computes a distinct scaling factor for each group and applies it to the learning rates of all parameters within that group. This calibration imposes a group-wise constraint that stabilizes training and accelerates convergence.
 
 ```bibtex
 @inproceedings{acl2025sgg,
