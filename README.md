@@ -30,9 +30,9 @@ Training large language models (LLMs) poses challenges due to their massive scal
 
 **Scaling with Gradient Grouping (SGG)** enhances adaptive optimizers by introducing a drop-in two-step process within each optimization step:
 
-1.  **Online Gradient Grouping:** For each layer, SGG dynamically groups parameters based on the magnitude of their gradient statistics (e.g., second-moment estimates). This ensures that parameters with similarly-sized gradients are updated collectively.
+* **Online Gradient Grouping:** For each layer, SGG clusters parameters based on the magnitude of their gradient statistics (e.g., second-moment estimates). This ensures that parameters with similarly-sized gradients are updated collectively.
 
-2.  **Group-wise LR Scaling:** SGG then computes a distinct scaling factor for each group and applies it to the learning rates of all parameters within that group. This calibration imposes a group-wise constraint that stabilizes training and accelerates convergence.
+* **Group-wise LR Scaling:** SGG then computes a distinct scaling factor for each group and applies it to the learning rates of all parameters within that group. This calibration imposes a group-wise constraint that stabilizes training and accelerates convergence.
 
 
 ## BibTeX
