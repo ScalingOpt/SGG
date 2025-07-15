@@ -262,20 +262,25 @@
 
 <section class="section" id="Method" style="padding-top:1.5rem;">
     <div class="container" style="max-width: 80%; margin: 0 auto;">
-        <h1 class="title is-3" style="text-align:center; font-size: 2.3em; margin-bottom:1rem;">Method</h1>
-        <br>
-      <div style="text-align: center; margin: 2rem 0;">
-        <img src="website/img/SGG_2.png" alt="SGG Framework Overview" style="width: 40%; height: auto; display: inline-block;">
-      </div>
-        <div class="content has-text-justified" style="max-width: 85%; font-size: 1.2em; margin: 0 auto; line-height: 1.55;">
-            <p style="text-align:justify; color:rgb(31, 30, 30);">
-                The key steps of SGG are as follows:
-            </p>
-            <ol style="text-align:justify; color:rgb(31, 30, 30);">
-                <li>Dynamic Gradient Grouping: SGG dynamically clusters gradient statistics (specifically momentum vectors) in each layer into K groups using online clustering algorithms such as mini-batch K-means.</li>
-                <li>Cluster-specific Learning Rate Scaling: After grouping, SGG calculates a scaling factor for each cluster based on the deviation of the cluster's statistics relative to the layer's and the entire model's global statistics. This scaling factor modulates the learning rate for each parameter in the cluster.</li>
-                <li>Parameter Update: The scaled learning rates are then used to update the model parameters, ensuring that each parameter adapts its learning rate based on its group's characteristics while maintaining individual parameter adaptation.</li>
-            </ol>
+        <h1 class="title is-3" style="text-align:center; font-size: 2.3em; margin-bottom:2rem;">Method</h1>
+        <div class="columns is-vcentered">
+            <div class="column is-two-fifths has-text-centered">
+                <img src="website/img/SGG_2.png" alt="SGG Framework Overview" style="width: 90%; height: auto;">
+            </div>
+            <div class="column">
+                <div class="content has-text-justified" style="font-size: 1.1em; margin: 0 auto; line-height: 1.55;">
+                    <p style="text-align:justify; color:rgb(31, 30, 30);">
+                        The key steps of SGG are as follows:
+                    </p>
+                    <ol style="text-align:justify; color:rgb(31, 30, 30);">
+                        <li><b>Dynamic Gradient Grouping:</b> SGG dynamically clusters gradient statistics (specifically momentum vectors) in each layer into K groups using online clustering algorithms such as mini-batch K-means.</li>
+                        <br>
+                        <li><b>Cluster-specific Learning Rate Scaling:</b> After grouping, SGG calculates a scaling factor for each cluster based on the deviation of the cluster's statistics relative to the layer's and the entire model's global statistics. This scaling factor modulates the learning rate for each parameter in the cluster.</li>
+                        <br>
+                        <li><b>Parameter Update:</b> The scaled learning rates are then used to update the model parameters, ensuring that each parameter adapts its learning rate based on its group's characteristics while maintaining individual parameter adaptation.</li>
+                    </ol>
+                </div>
+            </div>
         </div>
     </div>
 </section>
@@ -289,7 +294,7 @@
         <h2 class="subtitle is-4" style="text-align:center; font-size: 1.1em;">Comparison Results with LLMs</h2>
         <h3 class="subtitle is-5" style="text-align:center; font-size: 1em;">Pre-training on C4</h3>
         <table class="table is-fullwidth">
-            <caption style="caption-side: top; font-weight: bold; text-align: center;">Table 4: C4 Pre-training with diverse LLaMA sizes (from 60M to 1B). Comparison of full-rank, memory-efficient, and low-rank optimizers. Validation Perplexity (PPL%↓: lower is better) is reported. Bold and green types denote the best results and gains↓ of SGG (blue background) over related baselines (gray background). Note that † denotes the results borrowed from GaLore, while the others were reimplemented in this work.</caption>
+            <caption style="caption-side: top; font-weight: bold; text-align: center; font-size: 1.1em; color: #363636;">Table 4: C4 Pre-training with diverse LLaMA sizes (from 60M to 1B). Comparison of full-rank, memory-efficient, and low-rank optimizers. Validation Perplexity (PPL%↓: lower is better) is reported. Bold and green types denote the best results and gains↓ of SGG (blue background) over related baselines (gray background). Note that † denotes the results borrowed from GaLore, while the others were reimplemented in this work.</caption>
             <thead>
                 <tr>
                     <th>Method</th>
@@ -473,7 +478,7 @@
         </table>
         <h3 class="subtitle is-5" style="text-align:center; font-size: 1em;">SFT on GLUE</h3>
         <table class="table is-fullwidth">
-            <caption style="caption-side: top; font-weight: bold; text-align: center;">Table 5: GLUE Benchmark Results with RoBERTa-base. Top-1 accuracy (%↑: higher is better) is reported. Comparison across both full-rank and low-rank (LoRA r = 4, r = 8) settings. Bold and green types denote the best results and performance gains↑ of SGG (blue background) compared to related baselines (gray background).</caption>
+            <caption style="caption-side: top; font-weight: bold; text-align: center; font-size: 1.1em; color: #363636;">Table 5: GLUE Benchmark Results with RoBERTa-base. Top-1 accuracy (%↑: higher is better) is reported. Comparison across both full-rank and low-rank (LoRA r = 4, r = 8) settings. Bold and green types denote the best results and performance gains↑ of SGG (blue background) compared to related baselines (gray background).</caption>
             <thead>
                 <tr>
                     <th>Optimizer</th>
@@ -767,7 +772,7 @@
         </table>
         <h3 class="subtitle is-5" style="text-align:center; font-size: 1em;">PEFT on Commonsense Reasoning</h3>
         <table class="table is-fullwidth">
-            <caption style="caption-side: top; font-weight: bold; text-align: center;">Table 6: LLaMA-7B PEFT Results on Commonsense Reasoning. Comparison of LoRA+SGG (blue background) against baselines. Top-1 accuracy (%↑: higher is better) of selected tasks and all tasks on average (Avg.) are reported. Bold and green types denote the best results and gains↑ compared to LoRA (gray background).</caption>
+            <caption style="caption-side: top; font-weight: bold; text-align: center; font-size: 1.1em; color: #363636;">Table 6: LLaMA-7B PEFT Results on Commonsense Reasoning. Comparison of LoRA+SGG (blue background) against baselines. Top-1 accuracy (%↑: higher is better) of selected tasks and all tasks on average (Avg.) are reported. Bold and green types denote the best results and gains↑ compared to LoRA (gray background).</caption>
             <thead>
                 <tr>
                     <th>Method</th>
@@ -876,7 +881,7 @@
         <h2 class="subtitle is-4" style="text-align:center; font-size: 1.1em;">Comparison Results with MLLMs</h2>
         <h3 class="subtitle is-5" style="text-align:center; font-size: 1em;">Full-Rank SFT</h3>
         <table class="table is-fullwidth">
-            <caption style="caption-side: top; font-weight: bold; text-align: center;">Table 8: MLLM performance comparison on diverse benchmarks with LLaVA variants and different optimizers. Top-1 accuracy (%)↑ for selected tasks and all-task averaged (Avg.) results are reported. MMB and MMBCN denote MMbench and MMbench (Chinese). Bold and green types denote the best results and gains↓ of SGG (blue background) over related baselines (gray background). Please view Table A6 for the full results.</caption>
+            <caption style="caption-side: top; font-weight: bold; text-align: center; font-size: 1.1em; color: #363636;">Table 8: MLLM performance comparison on diverse benchmarks with LLaVA variants and different optimizers. Top-1 accuracy (%)↑ for selected tasks and all-task averaged (Avg.) results are reported. MMB and MMBCN denote MMbench and MMbench (Chinese). Bold and green types denote the best results and gains↓ of SGG (blue background) over related baselines (gray background). Please view Table A6 for the full results.</caption>
             <thead>
                 <tr>
                     <th>Optimizer</th>
@@ -1072,7 +1077,7 @@
         </table>
         <h3 class="subtitle is-5" style="text-align:center; font-size: 1em;">Low-Rank SFT (AdamW)</h3>
         <table class="table is-fullwidth">
-            <caption style="caption-side: top; font-weight: bold; text-align: center;">Table 8 (cont.)</caption>
+            <caption style="caption-side: top; font-weight: bold; text-align: center; font-size: 1.1em; color: #363636;">Table 8 (cont.)</caption>
             <thead>
                 <tr>
                     <th>Optimizer</th>
@@ -1125,7 +1130,7 @@
         </table>
         <h3 class="subtitle is-5" style="text-align:center; font-size: 1em;">8-bit Low-Rank SFT (AdamW)</h3>
         <table class="table is-fullwidth">
-            <caption style="caption-side: top; font-weight: bold; text-align: center;">Table 8 (cont.)</caption>
+            <caption style="caption-side: top; font-weight: bold; text-align: center; font-size: 1.1em; color: #363636;">Table 8 (cont.)</caption>
             <thead>
                 <tr>
                     <th>Optimizer</th>
