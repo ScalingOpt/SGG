@@ -17,10 +17,10 @@
 <br>
 
 <p align="center">
-  <img src="figures/SGG_1.png" width="75%"/>
+  <img src="figures/SGG_1.png" width="70%"/>
   <br>
   <em>
-    Illustration of SGG with online grouping and group-specific learning rate (LR) scaling upon adaptive LR optimizers.
+    SGG with online grouping and group-specific learning rate (LR) scaling upon adaptive LR optimizers.
   </em>
 </p>
 
