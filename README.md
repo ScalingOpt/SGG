@@ -34,6 +34,9 @@ Training large language models (LLMs) poses challenges due to their massive scal
 
 2.  **Group-wise LR Scaling:** SGG then computes a distinct scaling factor for each group and applies it to the learning rates of all parameters within that group. This calibration imposes a group-wise constraint that stabilizes training and accelerates convergence.
 
+
+## BibTeX
+
 ```bibtex
 @inproceedings{acl2025sgg,
      title={Taming LLMs with Gradient Grouping},
